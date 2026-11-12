@@ -9,6 +9,10 @@ matching rule. Inline chunks (raw, no path) are untouched.
     python tools/kerchunk_remap.py SRC DST --rule FROM=TO [--rule FROM=TO ...]
     python tools/kerchunk_remap.py SRC --scan             # list path prefixes only
 
+SRC may be a local directory or a source.coop URL
+(https://data.source.coop/<account>/<repo>/...), read anonymously, so a
+published store can be remapped straight to local disk without a copy first.
+
 After remapping, --check samples paths in DST and confirms the files exist
 and each referenced byte range lies inside its file.
 
@@ -17,13 +21,36 @@ Destined for raad.virtualize; lives here while trend.ice needs it.
 import argparse
 import os
 import random
-import shutil
 import sys
 from collections import Counter
 
 import pyarrow as pa
 import pyarrow.compute as pc
+import pyarrow.fs as pafs
 import pyarrow.parquet as pq
+
+SOURCECOOP = "https://data.source.coop/"
+
+
+def source_fs(src):
+    """(filesystem, root) for a local path or a source.coop URL"""
+    if src.startswith(SOURCECOOP):
+        fs = pafs.S3FileSystem(anonymous=True, endpoint_override="https://data.source.coop")
+        return fs, src[len(SOURCECOOP):].strip("/")
+    return pafs.LocalFileSystem(), os.path.abspath(src)
+
+
+def list_files(src):
+    """(filesystem, root, [relative paths]) of all files under src"""
+    fs, root = source_fs(src)
+    info = fs.get_file_info(pafs.FileSelector(root, recursive=True))
+    rel = [i.path[len(root):].lstrip("/") for i in info if i.type == pafs.FileType.File]
+    return fs, root, rel
+
+
+def is_refs(rel):
+    b = os.path.basename(rel)
+    return b.startswith("refs.") and b.endswith(".parq")
 
 DEFAULT_RULES = [
     ("https://thredds.nci.org.au/thredds/fileServer/", "/g/data/"),
@@ -35,7 +62,7 @@ DEFAULT_RULES = [
 def ref_files(root):
     for d, _, fs in os.walk(root):
         for f in fs:
-            if f.startswith("refs.") and f.endswith(".parq"):
+            if is_refs(f):
                 yield os.path.join(d, f)
 
 
@@ -44,10 +71,14 @@ def prefix_of(p, depth=6):
     return "/".join(parts[:depth]) + "/"
 
 
-def scan(root, n=20):
+def scan(src, n=20):
+    fs, root, rel = list_files(src)
     c = Counter()
-    for f in ref_files(root):
-        t = pq.read_table(f, columns=["path"])
+    for r in rel:
+        if not is_refs(r):
+            continue
+        with fs.open_input_file(f"{root}/{r}") as f:
+            t = pq.read_table(f, columns=["path"])
         for p in pc.unique(t["path"]).to_pylist():
             if p is not None:
                 c[prefix_of(p)] += 1
@@ -76,16 +107,21 @@ def remap_table(t, rules):
 def remap(src, dst, rules):
     if os.path.exists(dst):
         sys.exit(f"{dst} exists; refusing to overwrite")
-    shutil.copytree(src, dst, ignore=shutil.ignore_patterns("refs.*.parq"))
+    fs, root, rel = list_files(src)
     nfile = nunm = 0
-    for f in ref_files(src):
-        t = pq.read_table(f)
-        t2, unm = remap_table(t, rules)
-        out = os.path.join(dst, os.path.relpath(f, src))
+    for r in rel:
+        out = os.path.join(dst, r)
         os.makedirs(os.path.dirname(out), exist_ok=True)
-        pq.write_table(t2, out, compression="zstd")
-        nfile += 1
-        nunm += unm
+        if is_refs(r):
+            with fs.open_input_file(f"{root}/{r}") as f:
+                t = pq.read_table(f)
+            t2, unm = remap_table(t, rules)
+            pq.write_table(t2, out, compression="zstd")
+            nfile += 1
+            nunm += unm
+        else:
+            with fs.open_input_stream(f"{root}/{r}") as f, open(out, "wb") as g:
+                g.write(f.read())
     print(f"remapped {nfile} ref files; {nunm} paths matched no rule (left as is)")
     return nunm
 

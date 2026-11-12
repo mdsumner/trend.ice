@@ -6,6 +6,38 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (i) - BRAN stores: remap straight from source.coop
+
+Container refreshed on Gadi; `gadi/check_env.sh`: everything present
+(pyarrow 26, fsspec, xarray, zarr 3.4, fastparquet, kerchunk, icechunk 2.3,
+terra, vapour, gdalraster, arrow; GDAL 3.13.3).
+
+BRAN kerchunk stores (BRAN2020 daily, 12265 days from 1993-01, 0.1 deg,
+1500 x 3600) on source.coop under
+`ausantarctic/ausantarctic-scratch/bluelink/bluelink-daily-<var>/kerchunk`:
+
+- `mld`: (Time, yt, xt) f4, m, chunks 1 x 661 x 1586; refs 1.7 MB
+- `temp`: (Time, st_ocean[51], yt, xt) i2 scaled, chunks 1 x 1 x 300 x 300; 464 MB
+- `salt`: as temp, scale 0.00168, offset 45, psu; 463 MB
+- also eta_t, u, v, w, tx/ty_trans_int_z
+
+Paths are `https://thredds.nci.org.au/thredds/fileServer/gb6/BRAN/BRAN2020/
+daily/ocean_<var>_YYYY_MM.nc` -> default rule gives `/g/data/gb6/...`.
+
+`tools/kerchunk_remap.py` now reads SRC directly from a source.coop URL (no
+copy step); tried live on the mld store from the cloud workspace: 5 ref
+files remapped, 0 unmatched, paths -> /g/data/gb6/BRAN/BRAN2020/daily/...
+
+Next (Gadi):
+
+    git pull
+    qsub gadi/remap_bran.sh     # mld, temp, salt -> /g/data/jk72/mds581/bluelink-gdata/
+
+Check the job output for "0 paths matched no rule" and "0 problems" per
+variable. Then the BRAN composite step (surface temp/salt = st_ocean[0]).
+
+---
+
 ## 2026-11-13 (h) - Gadi container setup
 
 Gadi setup has not been used since the raad.virtualize BRAN push; the image
