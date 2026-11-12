@@ -31,10 +31,9 @@ early record) are linearly interpolated. A season containing a longer gap is
 not computed. Dates whose field is mostly empty count as missing, not as open
 water.
 
-The input (NSIDC sea ice CDR via raadtools) lists a file for every day, but
-the Dec 1987 - Jan 1988 gap is present as empty fields (42 dates dropped), so
-the 1987 ice year is not computed. Check `ndropped` in the manifest for the
-every-other-day SMMR years (1979-1987). Other treatments exist: Stammerjohn-style
+The input (NSIDC sea ice CDR via raadtools) has a filled daily field
+throughout the SMMR years, but the SSM/I gap 1987-12-03 to 1988-01-13
+(42 days) is present as empty fields, so the 1987 ice year is not computed. Other treatments exist: Stammerjohn-style
 processing used a climatology for the long gap and carried the previous day
 forward over two-day gaps. Seasons spanning 1987-88 should be read with that
 in mind whichever treatment is used.

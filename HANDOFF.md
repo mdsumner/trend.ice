@@ -6,6 +6,28 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (g) - gap pinned down
+
+Dropped dates for the 1987 ice year are exactly 1987-12-03 .. 1988-01-13
+(42 days, one more than the often-quoted Dec 3 - Jan 12). Plots of the
+SMMR era (Oct-Nov 1978) show a filled field every day, so the CDR fills the
+every-other-day record; only the 1987-88 gap is empty. The first full run is
+therefore correct except for 1987.
+
+Change: the driver now updates rows in an existing manifest instead of
+overwriting it, so a single year can be rerun.
+
+Next (Nectar):
+
+    git pull
+    Rscript R/ice_season.R 1987 1987 15 ~/iceseason_v2
+    rm ~/iceseason_v2/south_iceseason_t15_1987-02-15.tif   # stale, from the first run
+    cp ~/iceseason_v2/manifest_t15.csv manifests/ && git commit -am "1987 not computed (SSM/I gap)" && git push
+
+Then: COGs to Acacia `aad-derived/trend-ice/`, vrtstack index.
+
+---
+
 ## 2026-11-12 (f) - 1987 check (Nectar)
 
 `Rscript R/ice_season.R 1987 1987 15 /tmp/ice1987`: nobs 323, ndropped 42,

@@ -176,7 +176,16 @@ if (sys.nframe() == 0L) {
     message(y)
     run_year(y, threshold = threshold, outdir = outdir)
   }))
-  write.csv(manifest, file.path(outdir, sprintf("manifest_t%02d.csv", as.integer(threshold))),
-            row.names = FALSE)
+  ## update rows in an existing manifest rather than overwrite it, so single
+  ## years can be rerun
+  mfile <- file.path(outdir, sprintf("manifest_t%02d.csv", as.integer(threshold)))
+  if (file.exists(mfile)) {
+    old <- utils::read.csv(mfile, stringsAsFactors = FALSE)
+    old <- old[!old$year %in% manifest$year, , drop = FALSE]
+    for (nm in setdiff(names(manifest), names(old))) old[[nm]] <- rep(NA, nrow(old))
+    manifest <- rbind(old[names(manifest)], manifest)
+    manifest <- manifest[order(manifest$year), ]
+  }
+  write.csv(manifest, mfile, row.names = FALSE)
   print(manifest)
 }
