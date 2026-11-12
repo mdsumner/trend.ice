@@ -6,6 +6,33 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (h) - Gadi container setup
+
+Gadi setup has not been used since the raad.virtualize BRAN push; the image
+needs a refresh. Added `gadi/`:
+
+- `pull.sh`: qsub job on copyq that re-pulls
+  ghcr.io/hypertidy/gdal-r-python-extras into /g/data/jk72/mds581/sif_lib
+  (same as the existing singul.sh)
+- `env.sh`: SIF path and `singularity exec -B /g/data` wrapper
+- `check_env.sh`: lists which Python modules (pyarrow, fsspec, xarray, zarr,
+  fastparquet, kerchunk, icechunk, ...) and R packages (terra, vapour,
+  gdalraster, arrow) the image has
+- `remap.sh`: qsub job (storage gdata/jk72+gdata/gb6) running the kerchunk
+  remap + check: `qsub -v SRC=...,DST=... gadi/remap.sh`
+
+Next (Gadi):
+
+    git clone https://github.com/mdsumner/trend.ice && cd trend.ice   # or pull
+    qsub gadi/pull.sh
+    ## when done:
+    bash gadi/check_env.sh
+
+Paste the check output; anything missing gets added to the image (or
+pip-installed to a user site) before the remap.
+
+---
+
 ## 2026-11-13 (g) - near-baseline result
 
 Baseline offset was real (median 0 / 3 / 5 degrees for early / mid / late).
