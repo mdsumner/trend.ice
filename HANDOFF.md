@@ -6,6 +6,30 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (d) - curves for the context run
+
+Context run started on Nectar (with depth from `sds::gebco()`).
+
+Added `R/curves.R` (bin_curve, plot_curves, retreat_timing, baseline_for)
+and `scripts/curves_context.R` (tested, `tests/test_curves_context.R`):
+by retreat timing as raw / clean (ice_near == 0) / clean minus open-water
+baseline (same composite, sector, nearest latitude band with open water);
+sector and shelf (depth > -1000 m) splits on the baseline anomaly; and a
+table of pre-retreat level raw vs clean per tercile (the contamination
+test).
+
+When the run finishes (Nectar):
+
+    git pull
+    cp ~/trend-ice-chl-v2/log.csv manifests/chl_context_log.csv
+    Rscript scripts/curves_context.R ~/trend-ice-chl-v2 ~/trend-ice-curves-v2
+    mkdir -p results/curves_v2 && cp ~/trend-ice-curves-v2/* results/curves_v2/
+    git add manifests results/curves_v2 && git commit -m "Context curves" && git push
+
+`curves_all.R` still works on the v2 tables (extra columns are ignored).
+
+---
+
 ## 2026-11-13 (c) - context run (baseline, ice-edge flag, depth)
 
 Added `R/context.R` (tested, `tests/test_context.R`):
