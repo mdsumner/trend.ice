@@ -6,6 +6,37 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (e) - full run 1979-2025 reviewed (cloud workspace)
+
+`manifests/manifest_t15.csv`: all 47 ice years "ok", nobs = 365/366 every
+year, vmin 0 / vmax 100.
+
+Suspicious: every year has a file for every day, including 1979-1987 (the
+SMMR record is every other day) and the Dec 1987 - Jan 1988 SSM/I gap. So
+the CDR as listed by raadtools has a file per day, and missing days are
+either filled (interpolated in the product) or present but empty. If empty,
+the old code treated them as open water - that would pull advance/retreat
+into the gap.
+
+Change: `read_ice_obs()` now drops dates whose field has less than half the
+median number of valid cells (an empty or mostly empty day is a missing
+observation, not open water), so `fill_daily()` interpolates short gaps and
+the gap rule skips a season with a long one. Manifest gains `ndropped`;
+`nobs` is now the number of dates kept.
+
+Next (Nectar):
+
+1. `git pull`
+2. Rerun the years that should show it: `Rscript R/ice_season.R 1979 1988 15 ~/iceseason_v2`
+   - expect ndropped ~ 180 per year 1979-1986 if the empty alternate days are
+     present, and 1987 to come back "gap > max_gap" if the 1987-88 gap is
+     empty in the files
+   - if ndropped is 0 everywhere, the CDR has filled the gaps itself (check the
+     product docs) and the earlier full run stands
+3. If anything changed, rerun the full range and commit the manifest again.
+
+---
+
 ## 2026-11-12 (d) - 2001 comparison with old rds
 
 - CRS: old rds carries a proj4 string (Hughes ellipsoid, lat_ts -70), the CDR

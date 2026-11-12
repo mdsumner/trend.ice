@@ -18,6 +18,8 @@
 ##  * shorter gaps (the two-daily early record) are linearly interpolated
 ##  * retreat is only defined where there was an ice season (an advance), so
 ##    isolated ice days in open water do not produce a retreat
+##  * dates whose field is mostly empty are treated as missing observations
+##    (dropped before interpolation), not as open water
 ##  * flags ice_at_start / ice_at_end and n_missing are written alongside, so
 ##    perennial-ice pixels can be excluded downstream rather than encoded
 ##    in the values
@@ -121,8 +123,13 @@ read_ice_obs <- function(dates, hemisphere = "south") {
     m <- m * 100
   }
   m[m > 100] <- NA  ## flag values, if any survive setNA
-  list(m = m, obs_dates = obs_dates, template = x[[1L]],
-       vrange = range(m, na.rm = TRUE))
+  ## a date whose field is (mostly) empty is a missing observation, not a day
+  ## of open water: drop it so fill_daily() interpolates or the gap rule applies
+  nvalid <- colSums(!is.na(m))
+  keep <- nvalid >= 0.5 * stats::median(nvalid)
+  if (sum(keep) < 2L) return(NULL)
+  list(m = m[, keep, drop = FALSE], obs_dates = obs_dates[keep], template = x[[1L]],
+       vrange = range(m, na.rm = TRUE), ndropped = sum(!keep))
 }
 
 run_year <- function(year, threshold = 15, outdir = "iceseason_v2",
@@ -150,6 +157,7 @@ run_year <- function(year, threshold = 15, outdir = "iceseason_v2",
   }
   data.frame(year = year, start = format(dates[1L]), end = format(dates[length(dates)]),
              threshold = threshold, nobs = if (is.null(obs)) 0L else length(obs$obs_dates),
+             ndropped = if (is.null(obs)) NA_integer_ else obs$ndropped,
              vmin = if (is.null(obs)) NA_real_ else obs$vrange[1L],
              vmax = if (is.null(obs)) NA_real_ else obs$vrange[2L],
              status = status, file = if (status == "ok") basename(fname) else NA_character_)
