@@ -6,6 +6,24 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (n) - full chl run kicked off (overnight)
+
+`scripts/run_chl_dsr.R`: ice years 1997-2025, composites with mid-date
+Sep 1 .. Apr 30, one table per ice year (`chl_dsr_<year>.parquet`, or
+.csv.gz if arrow is missing) plus `log.csv`; restartable (existing years
+skipped), per-composite failures logged and skipped; `cores` workers via
+mclapply.
+
+Started on Nectar:
+
+    nohup Rscript scripts/run_chl_dsr.R 1997 2025 ~/trend-ice-chl 4 > ~/trend-ice-chl.log 2>&1 &
+
+Tomorrow: check `~/trend-ice-chl/log.csv` and the tail of
+`~/trend-ice-chl.log`; commit `log.csv` to `manifests/chl_dsr_log.csv`; then
+the stratified curves (retreat-timing terciles, shelf/off-shelf, sectors).
+
+---
+
 ## 2026-11-12 (m) - first bloom curve (ice year 2015, Oct 2015 - Mar 2016)
 
 36 composites, ~330k cell-composites in dsr -30..120. Median log10 chl:
