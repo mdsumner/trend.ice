@@ -26,8 +26,8 @@ message(nrow(f), " composites ", min(f$start), " .. ", max(f$start))
 
 ## one composite as a map
 pick <- f[which.min(abs(f$mid - as.Date(sprintf("%d-12-15", year)))), ]
-g <- chl_on_icegrid(pick$file)
-dsr <- ice_day_of(pick$mid) - ret
+g <- chl_on_icegrid(pick$file, template = ret)
+dsr <- (as.integer(pick$mid - as.Date(sprintf("%d-02-15", year))) + 1L) - ret
 names(dsr) <- "days_since_retreat"
 png(file.path(outdir, sprintf("map_%s.png", format(pick$mid))), width = 1500, height = 520)
 plot(c(ret, g$log10chl, dsr), nc = 3,
@@ -39,7 +39,7 @@ dev.off()
 ## the season as a long table
 tab <- do.call(rbind, lapply(seq_len(nrow(f)), function(i) {
   message(format(f$mid[i]))
-  chl_dsr_table(chl_on_icegrid(f$file[i]), ret, f$mid[i])
+  chl_dsr_table(chl_on_icegrid(f$file[i], template = ret), ret, f$mid[i], year)
 }))
 write.csv(tab, file.path(outdir, sprintf("chl_dsr_%d.csv", year)), row.names = FALSE)
 

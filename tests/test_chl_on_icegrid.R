@@ -17,6 +17,12 @@ stopifnot(ice_year_of(as.Date("2016-01-10")) == 2015, ice_year_of(as.Date("2016-
           ice_day_of(as.Date("2015-02-15")) == 1, ice_day_of(as.Date("2015-12-15")) == 304)
 ## dsr table
 ret <- rast(ice_grid()); values(ret) <- 280L
-tab <- chl_dsr_table(out, ret, as.Date("2015-12-15"))
+tab <- chl_dsr_table(out, ret, as.Date("2015-12-15"), 2015)
 print(head(tab)); stopifnot(all(tab$dsr == 24L), all(tab$n >= 1))
+## after Feb 14 the count continues in the same ice year
+tab2 <- chl_dsr_table(out, ret, as.Date("2016-02-20"), 2015)
+stopifnot(all(tab2$dsr == 371L - 280L))
+## nothing in range: zero-row table, not an error
+tab3 <- chl_dsr_table(out, ret, as.Date("2015-03-01"), 2015)
+stopifnot(nrow(tab3) == 0L)
 cat("chl tests pass\n")

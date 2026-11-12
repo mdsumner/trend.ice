@@ -6,6 +6,18 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (l) - demo fix
+
+Demo failed at the 2016-02-17 composite: its mid-date falls in ice year
+2016, so days were counted from Feb 15 2016 against 2015 retreat, nothing
+was in range, and a zero-row data.frame errored. Fixes: `chl_dsr_table()`
+takes `ice_year` and counts days from Feb 15 of that year (continuing past
+day 365); zero-row result is now fine. The "[rast] CRS do not match" warning
+came from mixing `ice_grid()`'s CRS with the COG's; the demo now regrids
+onto the retreat raster itself (`template = ret`). Tests extended.
+
+---
+
 ## 2026-11-12 (k) - chlorophyll onto the ice grid (first cut)
 
 OC-CCI v6.0 5-day chl on Acacia (anonymous read):

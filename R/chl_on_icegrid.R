@@ -72,18 +72,22 @@ ice_day_of <- function(date) {
 }
 
 ## Long table for one composite: cell, ice year, days since retreat,
-## log10 chl, n. retreat is a SpatRaster layer for that ice year
-## (e.g. read_iceseason("retreat", y)[[1]]). Cells without a retreat, with
+## log10 chl, n. retreat is the retreat layer for `ice_year`
+## (e.g. read_iceseason("retreat", ice_year)[[1]]); days are counted from Feb 15
+## of that ice year, so composites after Feb 14 keep counting (day > 365)
+## rather than wrapping into the next ice year. Cells without a retreat, with
 ## fewer than min_n valid source pixels, or outside dsr_range are dropped.
-chl_dsr_table <- function(chl, retreat, mid, dsr_range = c(-30L, 120L), min_n = 1) {
-  day <- ice_day_of(mid)
+## chl and retreat must be on the same grid.
+chl_dsr_table <- function(chl, retreat, mid, ice_year,
+                          dsr_range = c(-30L, 120L), min_n = 1) {
+  day <- as.integer(mid - as.Date(sprintf("%04d-02-15", ice_year))) + 1L
   v <- cbind(terra::values(chl), retreat = terra::values(retreat)[, 1])
   dsr <- day - v[, "retreat"]
   keep <- which(!is.na(v[, "log10chl"]) & !is.na(dsr) & v[, "n"] >= min_n &
                   dsr >= dsr_range[1] & dsr <= dsr_range[2])
   data.frame(cell = keep,
-             ice_year = ice_year_of(mid),
-             mid = mid,
+             ice_year = rep(as.integer(ice_year), length(keep)),
+             mid = rep(mid, length(keep)),
              dsr = as.integer(dsr[keep]),
              log10chl = v[keep, "log10chl"],
              n = v[keep, "n"])
