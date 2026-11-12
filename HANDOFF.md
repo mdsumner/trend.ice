@@ -6,6 +6,24 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (h) - publishing
+
+Added `scripts/publish.sh`: syncs the COGs and manifest to
+`s3://aad-derived/trend-ice/iceseason_t15/` with the `pawsey1197` profile
+(refuses if a skipped year still has a stale file; `--delete` keeps the
+bucket in step with the folder).
+
+Next (Nectar, after the 1987 rerun is committed):
+
+    scripts/publish.sh 15 ~/iceseason_v2
+
+Check read access the way the other aad-derived products are read, e.g.
+`gdalinfo /vsis3/aad-derived/trend-ice/iceseason_t15/south_iceseason_t15_2001-02-15.tif`
+with AWS_S3_ENDPOINT / profile set, or the public https URL if the bucket
+allows anonymous read. Then the vrtstack index over the 46 files.
+
+---
+
 ## 2026-11-12 (g) - gap pinned down
 
 Dropped dates for the 1987 ice year are exactly 1987-12-03 .. 1988-01-13

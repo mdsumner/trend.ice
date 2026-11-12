@@ -48,6 +48,10 @@ One Cloud Optimized GeoTIFF per ice year and threshold, native grid,
 
 plus `manifest_t15.csv` (year, dates, number of observations, status).
 
+Published to Pawsey Acacia by `scripts/publish.sh`:
+
+    s3://aad-derived/trend-ice/iceseason_t15/   (endpoint https://projects.pawsey.org.au)
+
 ## Run
 
 On a machine that sees the raadtools ice collection:
