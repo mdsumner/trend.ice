@@ -57,3 +57,20 @@ retreat level, mid retreat has the largest off-shelf rise (+0.15) vs early
 (+0.11) and late (+0.09). `curves_context.R` now also writes
 `timing_baseline_near` (baseline within 1 degree only) and the median
 latitude offset per tercile to quantify this.
+
+### Near-baseline result (baseline within 1 degree of latitude)
+
+Median latitude offset of the baseline: early 0, mid 3, late 5 degrees - the
+concern was real. Restricting to rows with open water within 1 degree:
+
+| off-shelf tercile | pre | peak (dsr) | rise | ratio | rows |
+|---|---|---|---|---|---|
+| early | -0.01 | +0.09 (85) | +0.09 | ~1.2x | 2.9M |
+| mid   | +0.04 | +0.20 (35) | +0.15 | ~1.4x | 1.0M |
+| late  | +0.10 | +0.35 (20) | +0.26 | ~1.8x | 0.14M |
+
+The ordering survives: off-shelf, later retreat gives a larger and faster
+bloom relative to open water at the same latitude, sector and date. The late
+subset is the northern edge of the late-retreat cells (where open water is
+near), so it is smaller and not the coastal core. Shelf rows are too few
+after this restriction to say much.

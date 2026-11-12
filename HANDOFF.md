@@ -6,6 +6,16 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (g) - near-baseline result
+
+Baseline offset was real (median 0 / 3 / 5 degrees for early / mid / late).
+With baseline within 1 degree, off-shelf ordering survives and sharpens:
+early ~1.2x (slow, dsr 85), mid ~1.4x (dsr 35), late ~1.8x (dsr 20) vs open
+water. Late subset is small (0.14M rows) and northern. Details in
+`results/curves_v2/README.md`.
+
+---
+
 ## 2026-11-13 (f) - kerchunk remap to /g/data
 
 Decision: run the BRAN step in situ on Gadi. Icechunk stores use absolute
