@@ -11,7 +11,7 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 Nectar report: tests pass; 2001 ran (365 obs, status ok) but the output is
 all zeros (daycount 0 everywhere).
 
-Diagnosis (likely): the raadtools ice collection now serves concentration as a
+Diagnosis (confirmed: raadtools terra refactor returns 0-1): concentration as a
 fraction 0-1 (old outputs were from the `nt_*_v1.1_s.bin` files in percent),
 so nothing reaches `>= 15`.
 
