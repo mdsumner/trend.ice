@@ -6,6 +6,29 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (b) - stratified curves reviewed
+
+Results committed in `results/curves/` with a README summarising them.
+Headline: retreat timing orders the bloom - early retreat: slow, broad, peak
+~45 d, ~0.31 mg m-3; mid: sharpest and largest, peak ~25 d, ~0.40; late:
+high pre-retreat level, small rise, peak ~15 d. Anomalies confirm peak
+timing moving earlier with later retreat. Weddell and Ross respond most,
+Indian least. Year peaks 0.23 (2024) to 0.49 (2019, 2021).
+
+Next, to separate retreat from season and place:
+
+1. Open-water baseline: same latitude band and dates in cells that had no
+   ice season -> seasonal light cycle to subtract (or model log10chl ~
+   s(day of year) + s(dsr) by sector).
+2. Ice-edge contamination check: drop cells within ~50 km of the 15% edge
+   on the composite date, or use chlor_a_log10_rmsd/bias, and see whether
+   the late tercile's high pre-retreat level survives.
+3. Shelf vs off-shelf split (GEBCO 1000 m isobath) - likely what separates
+   Weddell/Ross from Indian.
+4. Then BRAN covariates (MLD, SST, salinity) on cell + date.
+
+---
+
 ## 2026-11-13 (a) - full chl run done; stratified curves script
 
 Overnight run (Nectar, 4 cores): ice years 1997-2025 all "ok", 47-49
