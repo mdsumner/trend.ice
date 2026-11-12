@@ -6,6 +6,37 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (c) - context run (baseline, ice-edge flag, depth)
+
+Added `R/context.R` (tested, `tests/test_context.R`):
+
+- `cell_context(template, bathy)`: cell lon/lat/sector, depth if a
+  bathymetry source is given
+- `ice_window(dates, template)`: percent ice over the composite's 5 days,
+  max in the cell (`ice_max`) and in the 3x3 neighbourhood (`ice_near`)
+- `openwater_summary()`: chl in never-iced cells (daycount 0) by 1-degree
+  latitude band x sector per composite - the seasonal baseline with no
+  retreat
+
+`scripts/run_chl_context.R`: rerun of the full record into
+`~/trend-ice-chl-v2/` with `ice_max`/`ice_near` on every row, an
+`openwater_<year>` table per year and `cells.parquet` once. Ice for the
+flags comes from raadtools::readice (5 reads per composite).
+
+Next (Nectar):
+
+    git pull
+    nohup Rscript scripts/run_chl_context.R 1997 2025 ~/trend-ice-chl-v2 4 [BATHY] > ~/trend-ice-chl-v2.log 2>&1 &
+
+BATHY = any GDAL source of elevation (GEBCO COG/VRT); leave it off and
+depth can be joined later from cells.parquet.
+
+Then: curves with (a) rows with ice_near > 0 removed, (b) chl minus the
+open-water baseline at the same latitude band, sector and date, (c) shelf
+vs off-shelf.
+
+---
+
 ## 2026-11-13 (b) - stratified curves reviewed
 
 Results committed in `results/curves/` with a README summarising them.
