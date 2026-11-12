@@ -14,11 +14,17 @@
 iceseason_vars <- c("advance", "retreat", "duration", "daycount",
                     "ice_at_start", "ice_at_end", "n_missing")
 
-## Acacia access for /vsis3/ (pawsey1197 profile); call once per session
-iceseason_acacia <- function(profile = "pawsey1197") {
-  Sys.setenv(AWS_PROFILE = profile,
-             AWS_S3_ENDPOINT = "projects.pawsey.org.au",
+## Acacia access for /vsis3/; the aad-derived bucket reads anonymously.
+## Pass a profile (e.g. "pawsey1197") to read with credentials instead.
+iceseason_acacia <- function(profile = NULL) {
+  Sys.setenv(AWS_S3_ENDPOINT = "projects.pawsey.org.au",
              AWS_VIRTUAL_HOSTING = "NO")
+  if (is.null(profile)) {
+    Sys.setenv(AWS_NO_SIGN_REQUEST = "YES")
+  } else {
+    Sys.unsetenv("AWS_NO_SIGN_REQUEST")
+    Sys.setenv(AWS_PROFILE = profile)
+  }
   invisible(NULL)
 }
 

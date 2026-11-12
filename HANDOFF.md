@@ -6,6 +6,34 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (k) - chlorophyll onto the ice grid (first cut)
+
+OC-CCI v6.0 5-day chl on Acacia (anonymous read):
+`/vsis3/aad-derived/esacci-oc/v6.0-release/geographic/5day/chlor_a/YYYY/
+ESACCI-OC-L3S-CHLOR_A-MERGED-5D_DAILY_4km_GEO_PML_OCx-YYYYMMDD-fv6.0_chlor_a.tif`
+(Float32 mg m-3, NaN nodata, 8640x4320 EPSG:4326, date = composite start).
+
+Added:
+
+- `R/chl_on_icegrid.R`: `chl_files()`, `chl_on_icegrid()` (mean log10 chl +
+  area-weighted valid count n per 25 km EPSG:3412 cell, source cropped south
+  of 48S), `ice_year_of()`, `ice_day_of()`, `chl_dsr_table()` (long table:
+  cell, ice_year, mid, dsr, log10chl, n; dsr -30..120, n >= 1).
+- `tests/test_chl_on_icegrid.R`: synthetic regrid + date + table checks (pass).
+- `scripts/demo_chl_2015.R`: ice year 2015, Oct-Mar composites: one map
+  (retreat / log10 chl / dsr), the season table (csv) and a binned bloom
+  curve (csv + png).
+- `read_iceseason()` now reads Acacia anonymously by default (profile optional).
+
+Next (Nectar): `git pull; Rscript scripts/demo_chl_2015.R ~/trend-ice-demo`
+and look at the map and bloom curve. Expected: chl rising after dsr 0,
+peaking some weeks later.
+
+Later: whole record (1997-2025) table -> Parquet; sector split; BRAN
+covariates joined on cell + date.
+
+---
+
 ## 2026-11-12 (j) - access without VRT
 
 Decision: no VRT/mdim index for now - that belongs with raad.virtualize and
