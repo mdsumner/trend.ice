@@ -30,8 +30,9 @@ Next (Nectar):
 
 BATHY = `sds::gebco()`, i.e.
 `/vsicurl/https://data.source.coop/ausantarctic/gebco/GEBCO_2026.tif`
-(no download needed: `warp_average()` uses gdalwarp `-ovr AUTO` with
-average resampling, so it reads an overview, not the full 15" grid).
+(no download needed: `warp_average()` uses
+`vapour::gdal_raster_data()` with the ice grid's exact extent, dimension and
+crs and average resampling, so GDAL reads an overview, not the full grid).
 
 Then: curves with (a) rows with ice_near > 0 removed, (b) chl minus the
 open-water baseline at the same latitude band, sector and date, (c) shelf

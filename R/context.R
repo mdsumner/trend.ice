@@ -36,22 +36,19 @@ cell_context <- function(template, bathy = NULL) {
   out
 }
 
-## average a (possibly remote, global) raster onto the template with the
-## gdalwarp CLI, letting GDAL pick a suitable overview (-ovr AUTO) so a
-## 15 arc-second global source is not read at full resolution
+## average a (possibly remote, global) raster onto the template's exact grid
+## (extent, dimension, crs all given, so the warper never has to work out an
+## output grid; GDAL picks a suitable overview for the target resolution)
 warp_average <- function(src, template) {
-  dst <- tempfile(fileext = ".tif")
-  crs_file <- tempfile(fileext = ".wkt")
-  writeLines(terra::crs(template), crs_file)
   e <- as.vector(terra::ext(template))
-  status <- system2("gdalwarp", c(
-    "-q", "-overwrite", "-r", "average", "-ovr", "AUTO",
-    "-t_srs", crs_file,
-    "-te", e[["xmin"]], e[["ymin"]], e[["xmax"]], e[["ymax"]],
-    "-ts", terra::ncol(template), terra::nrow(template),
-    "-ot", "Float32", shQuote(src), dst))
-  if (status != 0) stop("gdalwarp failed for ", src)
-  terra::rast(dst)
+  v <- vapour::gdal_raster_data(src,
+                                target_ext = e[c("xmin", "xmax", "ymin", "ymax")],
+                                target_dim = c(terra::ncol(template), terra::nrow(template)),
+                                target_crs = terra::crs(template),
+                                resample = "average")
+  r <- terra::rast(template, nlyrs = 1)
+  terra::values(r) <- v[[1]]
+  r
 }
 
 ## dates: the days of the composite. reader(dates) must return a SpatRaster
