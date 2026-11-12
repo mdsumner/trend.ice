@@ -6,6 +6,40 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (m) - first bloom curve (ice year 2015, Oct 2015 - Mar 2016)
+
+36 composites, ~330k cell-composites in dsr -30..120. Median log10 chl:
+
+- dsr -30: -0.63 (~0.23 mg m-3), flat-ish to dsr 0 (-0.50)
+- rises after retreat to a peak at dsr 20-35: -0.35 (~0.45 mg m-3), about
+  double the pre-retreat level
+- declines steadily to -0.63 by dsr 100-120
+- upper quartile peaks earlier (dsr 20: -0.05, ~0.9 mg m-3) and falls faster
+- coverage: n per 5-day bin ~2-4k before retreat, ~10k at dsr 0, ~15k at
+  dsr 10-50, tailing to ~6k by dsr 115
+
+Reading: the classic ice-edge bloom, peaking 3-5 weeks after retreat.
+
+Caveats before reading more into it:
+
+- dsr is confounded with calendar date and latitude (early-retreat cells are
+  outer pack, Oct-Nov, low light; late-retreat cells are coastal, Jan-Feb);
+  different cells populate different bins
+- pre-retreat (dsr < 0) values come from leads / sub-15% ice and may carry
+  ice or cloud contamination
+
+Next:
+
+1. Stratify the curve by retreat timing (terciles of retreat day) and by
+   region (shelf vs off-shelf, sectors) - this is the actual question:
+   does retreat timing set bloom size and timing.
+2. Per-cell anomalies (each cell against its own seasonal mean) to remove
+   the composition effect.
+3. All ice years 1997-2025 -> Parquet; then BRAN covariates (MLD, SST,
+   salinity) joined on cell + date.
+
+---
+
 ## 2026-11-12 (l) - demo fix
 
 Demo failed at the 2016-02-17 composite: its mid-date falls in ice year
