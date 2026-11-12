@@ -24,8 +24,11 @@ iceseason_acacia()
 logfile <- file.path(outdir, "log.csv")
 logrow <- function(...) {
   d <- data.frame(..., time = format(Sys.time()))
-  write.table(d, logfile, sep = ",", row.names = FALSE,
-              col.names = !file.exists(logfile), append = TRUE)
+  if (file.exists(logfile)) {
+    write.table(d, logfile, sep = ",", row.names = FALSE, col.names = FALSE, append = TRUE)
+  } else {
+    write.table(d, logfile, sep = ",", row.names = FALSE)
+  }
 }
 
 for (year in first:last) {

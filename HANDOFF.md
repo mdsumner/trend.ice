@@ -6,6 +6,35 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (a) - full chl run done; stratified curves script
+
+Overnight run (Nectar, 4 cores): ice years 1997-2025 all "ok", 47-49
+composites each, ~75 min total. Rows per year 183k-480k; 1997-2001 are
+lowest (fewer ocean colour sensors in the merged record), 2016-2018 highest -
+remember this when comparing years.
+
+The "appending column names" warning came from the log writer; fixed.
+
+Added `scripts/curves_all.R` (tested on synthetic tables,
+`tests/test_curves_all.R`): reads all years, adds retreat day, timing
+terciles (early/mid/late over all cell-years), sector (Weddell 60W-20E,
+Indian 20-90E, W Pacific 90-160E, Ross 160E-130W, Bell-Amundsen 130-60W) and
+a within-cell-year anomaly; writes binned curves (all, timing, sector,
+sector x timing, year, anomalies) as csv + png, and peak dsr / peak median
+per ice year.
+
+Next (Nectar):
+
+    git pull
+    cp ~/trend-ice-chl/log.csv manifests/chl_dsr_log.csv
+    Rscript scripts/curves_all.R ~/trend-ice-chl ~/trend-ice-curves
+    git add manifests/chl_dsr_log.csv && git commit -m "chl run log" && git push
+
+Look at timing.png and timing_anom.png first: does early retreat give a
+smaller/later bloom (light-limited) and late retreat a sharper one?
+
+---
+
 ## 2026-11-12 (n) - full chl run kicked off (overnight)
 
 `scripts/run_chl_dsr.R`: ice years 1997-2025, composites with mid-date
