@@ -6,6 +6,23 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (f) - 1987 check (Nectar)
+
+`Rscript R/ice_season.R 1987 1987 15 /tmp/ice1987`: nobs 323, ndropped 42,
+status "gap > max_gap, not computed". The CDR does NOT fill the 1987-88 gap:
+the files exist but are empty. The first full run treated those 42 days as
+open water, so its 1987 season (and possibly the SMMR years) is wrong.
+
+Next (Nectar): rerun the full range with the current code and recommit the
+manifest; check ndropped for 1979-1986 (about 180 if alternate days are
+empty, 0 if the product filled them).
+
+1987 for the chlorophyll work: irrelevant (ocean colour starts 1997). A
+climatology fill (Stammerjohn-style) for 1987 can wait until someone needs
+the full seasonality record.
+
+---
+
 ## 2026-11-12 (e) - full run 1979-2025 reviewed (cloud workspace)
 
 `manifests/manifest_t15.csv`: all 47 ice years "ok", nobs = 365/366 every
