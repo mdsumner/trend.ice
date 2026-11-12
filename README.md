@@ -28,7 +28,16 @@ concentration (NSIDC 25 km, southern hemisphere, via raadtools for now).
 
 Observation gaps of up to `max_gap` days (default 5; covers the two-daily
 early record) are linearly interpolated. A season containing a longer gap is
-not computed.
+not computed. Dates whose field is mostly empty count as missing, not as open
+water.
+
+The input (NSIDC sea ice CDR via raadtools) appears to provide a value for
+every day, with the product's own gap filling in the every-other-day SMMR
+years (1979-1987) and the Dec 1987 - Jan 1988 gap - to be confirmed against
+the product documentation. Other treatments exist: Stammerjohn-style
+processing used a climatology for the long gap and carried the previous day
+forward over two-day gaps. Seasons spanning 1987-88 should be read with that
+in mind whichever treatment is used.
 
 ## Output
 
