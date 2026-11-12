@@ -108,8 +108,16 @@ read_ice_obs <- function(dates, hemisphere = "south") {
   x <- raadtools::readice(files$date, hemisphere = hemisphere, setNA = TRUE)
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
   m <- terra::values(x, mat = TRUE)
+  ## concentration must be percent; some products (e.g. NSIDC-0051 netCDF)
+  ## come as a fraction 0-1
+  vmax <- max(m, na.rm = TRUE)
+  if (is.finite(vmax) && vmax <= 1.0001) {
+    message("ice concentration looks like a fraction (max ", vmax, "), scaling to percent")
+    m <- m * 100
+  }
   m[m > 100] <- NA  ## flag values, if any survive setNA
-  list(m = m, obs_dates = obs_dates, template = x[[1L]])
+  list(m = m, obs_dates = obs_dates, template = x[[1L]],
+       vrange = range(m, na.rm = TRUE))
 }
 
 run_year <- function(year, threshold = 15, outdir = "iceseason_v2",
@@ -137,6 +145,8 @@ run_year <- function(year, threshold = 15, outdir = "iceseason_v2",
   }
   data.frame(year = year, start = format(dates[1L]), end = format(dates[length(dates)]),
              threshold = threshold, nobs = if (is.null(obs)) 0L else length(obs$obs_dates),
+             vmin = if (is.null(obs)) NA_real_ else obs$vrange[1L],
+             vmax = if (is.null(obs)) NA_real_ else obs$vrange[2L],
              status = status, file = if (status == "ok") basename(fname) else NA_character_)
 }
 

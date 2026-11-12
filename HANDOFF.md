@@ -6,6 +6,27 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (b) - cloud workspace
+
+Nectar report: tests pass; 2001 ran (365 obs, status ok) but the output is
+all zeros (daycount 0 everywhere).
+
+Diagnosis (likely): the raadtools ice collection now serves concentration as a
+fraction 0-1 (old outputs were from the `nt_*_v1.1_s.bin` files in percent),
+so nothing reaches `>= 15`.
+
+Change: `read_ice_obs()` scales to percent when max <= 1, with a message, and
+the manifest now records `vmin`/`vmax` of the input so this is visible.
+
+Next (Nectar):
+
+1. Confirm the diagnosis:
+   `x <- raadtools::readice("2001-08-15"); x; range(terra::values(x), na.rm = TRUE)`
+2. `git pull`, rerun 2001, check the manifest `vmax` is ~100 and daycount looks
+   like an ice season, then compare retreat with the old rds.
+
+---
+
 ## 2026-11-12 - cloud workspace (claude.ai)
 
 Done:
