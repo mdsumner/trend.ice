@@ -6,6 +6,37 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (e) - context curves reviewed
+
+Results in `results/curves_v2/` with README. Headlines:
+
+- Ice-edge contamination is not it: cleaning (no ice within ~75 km, 85% of
+  rows kept) raises the pre-retreat level for mid/late; ice-adjacent pixels
+  read lower.
+- Shelf (5% of rows) carries the late-retreat high pre-retreat level
+  (polynya/coastal water, ~7x open-water baseline) and the strongest blooms
+  (mid-retreat shelf ~5x baseline for two months).
+- Off-shelf retreat effect is modest: ~1.3x (early, slow), ~1.6x (mid,
+  dsr 35), ~1.8x (late, dsr 30) vs open water - but the late figure is
+  inflated by a baseline taken from further north.
+- Weddell strongest off-shelf, Indian weakest.
+
+Changed: `baseline_for()` now also returns `dlat` (latitude offset of the
+baseline band); `curves_context.R` writes `timing_baseline_near` (dlat <= 1)
+and `baseline_dlat_by_timing`.
+
+Next (Nectar, quick, no rerun of data):
+
+    git pull
+    Rscript scripts/curves_context.R ~/trend-ice-chl-v2 ~/trend-ice-curves-v2
+    cp ~/trend-ice-curves-v2/* results/curves_v2/
+    git add results/curves_v2 && git commit -m "Context curves with near baseline" && git push
+
+Then BRAN: MLD / SST / salinity joined on cell + composite date, starting
+with off-shelf mid-retreat cells (cleanest signal).
+
+---
+
 ## 2026-11-13 (d) - curves for the context run
 
 Context run started on Nectar (with depth from `sds::gebco()`).

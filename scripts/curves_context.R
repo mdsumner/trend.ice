@@ -41,7 +41,9 @@ message("retreat terciles: ", paste(format(as.Date("2001-02-14") + round(tm$brea
 
 tab$clean <- !is.na(tab$ice_near) & tab$ice_near == 0
 message(sprintf("clean rows: %.1f%%", 100 * mean(tab$clean)))
-tab$base <- baseline_for(tab, open, lat_band)
+bl <- baseline_for(tab, open, lat_band)
+tab$base <- bl$base
+tab$dlat <- bl$dlat
 tab$anom_base <- tab$log10chl - tab$base
 
 w <- function(x, name) utils::write.csv(x, file.path(outdir, paste0(name, ".csv")), row.names = FALSE)
@@ -66,6 +68,21 @@ if ("shelf" %in% names(tab)) {
               "Shelf vs off-shelf by retreat timing: clean, minus baseline", "median log10 chl - baseline")
   shs <- bin_curve(clb[!is.na(clb$shelf), ], "anom_base", by = c("shelf", "sector")); w(shs, "shelf_sector_baseline")
 }
+
+## baseline from the row's own latitude band only (dlat <= 1): avoids
+## comparing high-latitude cells with open water further north
+clx <- clb[!is.na(clb$dlat) & clb$dlat <= 1, ]
+message(sprintf("rows with baseline within 1 degree of latitude: %.1f%%", 100 * nrow(clx) / nrow(clb)))
+basx <- bin_curve(clx, "anom_base", by = "timing"); w(basx, "timing_baseline_near")
+plot_curves(basx, "timing", file.path(outdir, "timing_baseline_near.png"),
+            "By retreat timing: clean, minus open-water baseline within 1 deg latitude",
+            "median log10 chl - baseline")
+if ("shelf" %in% names(tab)) {
+  shx <- bin_curve(clx[!is.na(clx$shelf), ], "anom_base", by = c("shelf", "timing")); w(shx, "shelf_timing_baseline_near")
+}
+dl <- data.frame(timing = levels(clb$timing),
+                 median_dlat = tapply(clb$dlat, clb$timing, stats::median, na.rm = TRUE))
+w(dl, "baseline_dlat_by_timing"); print(dl)
 
 ## how much does cleaning change the pre-retreat level, per tercile
 pre <- function(cv) tapply(cv$med[cv$bin < 0], cv$timing[cv$bin < 0], mean)

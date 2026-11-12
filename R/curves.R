@@ -38,11 +38,14 @@ retreat_timing <- function(tab) {
 
 ## open-water baseline for each row: median log10 chl of never-iced cells at
 ## the same composite and sector, in the same 1-degree latitude band or, if
-## that band has no open water (high latitudes), the nearest band that does
+## that band has no open water (high latitudes), the nearest band that does.
+## Returns a data.frame: base (the median) and dlat (|band difference| in
+## degrees, 0 when the row's own band had open water).
 baseline_for <- function(tab, open, lat_band) {
   key_t <- paste(as.Date(tab$mid), tab$sector)
   open$key <- paste(as.Date(open$mid), open$sector)
-  out <- rep(NA_real_, nrow(tab))
+  base <- rep(NA_real_, nrow(tab))
+  dlat <- rep(NA_real_, nrow(tab))
   ok_open <- open[open$ncell >= 5, ]
   idx <- split(seq_len(nrow(tab)), key_t)
   for (k in names(idx)) {
@@ -51,7 +54,9 @@ baseline_for <- function(tab, open, lat_band) {
     i <- idx[[k]]
     ub <- unique(lat_band[i])
     jb <- vapply(ub, function(b) which.min(abs(o$lat_band - b)), integer(1))
-    out[i] <- o$med[jb[match(lat_band[i], ub)]]
+    m <- match(lat_band[i], ub)
+    base[i] <- o$med[jb[m]]
+    dlat[i] <- abs(o$lat_band[jb[m]] - lat_band[i])
   }
-  out
+  data.frame(base = base, dlat = dlat)
 }
