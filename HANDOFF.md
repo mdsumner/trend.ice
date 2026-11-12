@@ -6,6 +6,30 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (j) - access without VRT
+
+Decision: no VRT/mdim index for now - that belongs with raad.virtualize and
+can come later (the COGs are tiny to reprocess). Bespoke access instead:
+`R/read_iceseason.R`
+
+    source("R/read_iceseason.R")
+    ret <- read_iceseason("retreat", 1997:2025)              # from Acacia
+    ret <- read_iceseason("retreat", src = "~/iceseason_v2")  # local copy
+
+returns one layer per ice year, `time()` = ice year start, names like
+`retreat_2001`. Uses the manifest to skip 1987. Acacia access sets
+AWS_PROFILE=pawsey1197, AWS_S3_ENDPOINT=projects.pawsey.org.au,
+AWS_VIRTUAL_HOSTING=NO; the manifest is fetched with
+`gdalraster::vsi_copy_file()`.
+
+Untested against Acacia (written in the cloud workspace) - first use is the
+test. vrtstack note for later: `gdal_mdim_stack()` hard-codes SourceBand 1, so
+multi-band COGs need a `band` argument there (one array per band).
+
+Next: the chlorophyll side - bring the 5-day CCI chl onto this grid.
+
+---
+
 ## 2026-11-12 (i) - published
 
 46 COGs (1979-2025 minus 1987) and `manifest_t15.csv` are on Acacia at
