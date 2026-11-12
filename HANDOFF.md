@@ -6,6 +6,22 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (i) - published
+
+46 COGs (1979-2025 minus 1987) and `manifest_t15.csv` are on Acacia at
+`s3://aad-derived/trend-ice/iceseason_t15/` (stale 1987 file removed first).
+COGs are ~105-116 KB each.
+
+Check still to do: confirm the full run included d5be6df (retreat only where
+there is an advance) - see the one-liner in the chat log / below:
+
+    r <- terra::rast("~/iceseason_v2/south_iceseason_t15_2001-02-15.tif")
+    terra::global(!is.na(r$retreat) & is.na(r$advance), "sum")   # expect 0
+
+Next: vrtstack index over the 46 files.
+
+---
+
 ## 2026-11-12 (h) - publishing
 
 Added `scripts/publish.sh`: syncs the COGs and manifest to
