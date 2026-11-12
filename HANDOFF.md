@@ -6,6 +6,41 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (f) - kerchunk remap to /g/data
+
+Decision: run the BRAN step in situ on Gadi. Icechunk stores use absolute
+https URLs and cannot be remapped in place (read-time remap needs refs
+written against named `vcc://` containers); re-rendering for /g/data is
+being pursued in raad.virtualize. Here: the kerchunk Parquet store.
+
+Added `tools/kerchunk_remap.py` (destined for raad.virtualize; tested,
+`tests/test_kerchunk_remap.py` - synthetic netCDF, refs pointed at THREDDS,
+remapped to a local "gdata" tree, opened with xarray and compared):
+
+- writes a NEW store; copies everything, rewrites the `path` column of each
+  refs.*.parq by prefix rules (default NCI THREDDS fileServer/dodsC ->
+  /g/data/); inline chunks untouched; reports paths that matched no rule
+- `--scan` lists path prefixes in a store
+- `--check` samples refs in the new store: file exists, byte range inside
+  the file; non-zero exit on any problem or unmatched path
+
+Next (Gadi), e.g. with the ACCESS-NRI analysis env:
+
+    python3 tools/kerchunk_remap.py <BRAN store>.parq --scan
+    python3 tools/kerchunk_remap.py <BRAN store>.parq <BRAN store>-gdata.parq --check
+
+Open the remapped store:
+
+    import fsspec, xarray as xr
+    fs = fsspec.filesystem("reference", fo="<...>-gdata.parq", remote_protocol="file")
+    ds = xr.open_dataset(fs.get_mapper(), engine="zarr",
+                         backend_kwargs={"consolidated": False}, zarr_format=2)
+
+Report back: the scan output, the check line, and `list(ds.data_vars)` with
+dims, so the BRAN composite step can be written against real names.
+
+---
+
 ## 2026-11-13 (e) - context curves reviewed
 
 Results in `results/curves_v2/` with README. Headlines:
