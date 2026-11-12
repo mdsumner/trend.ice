@@ -6,6 +6,22 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (c) - Nectar run, logged from cloud workspace
+
+2001 reran fine: 365 obs, vmin 0 / vmax 100 after scaling, status ok.
+
+Input product: raadtools `readice()` now reads through `read_nsidc_cdr_daily`
+(NSIDC sea ice CDR), not the NASA Team `nt_*_v1.1_s.bin` files the old
+aceecostats outputs used. So a comparison with the old rds will differ by
+algorithm as well as by the bug fixes - judge it by the pattern (the
+perennial-ice pixels and the +1 shift), not exact agreement.
+
+Next: compare 2001 with the old rds, then full run 1979-2025 at 15 and commit
+`manifest_t15.csv`. Check the CDR start date - the first ice years may come
+back "no data" or "gap" if the CDR daily record starts later than 1979.
+
+---
+
 ## 2026-11-12 (b) - cloud workspace
 
 Nectar report: tests pass; 2001 ran (365 obs, status ok) but the output is
