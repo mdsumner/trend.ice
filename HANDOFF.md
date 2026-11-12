@@ -28,8 +28,10 @@ Next (Nectar):
     git pull
     nohup Rscript scripts/run_chl_context.R 1997 2025 ~/trend-ice-chl-v2 4 [BATHY] > ~/trend-ice-chl-v2.log 2>&1 &
 
-BATHY = any GDAL source of elevation (GEBCO COG/VRT); leave it off and
-depth can be joined later from cells.parquet.
+BATHY = `sds::gebco()`, i.e.
+`/vsicurl/https://data.source.coop/ausantarctic/gebco/GEBCO_2026.tif`
+(no download needed: `warp_average()` uses gdalwarp `-ovr AUTO` with
+average resampling, so it reads an overview, not the full 15" grid).
 
 Then: curves with (a) rows with ice_near > 0 removed, (b) chl minus the
 open-water baseline at the same latitude band, sector and date, (c) shelf

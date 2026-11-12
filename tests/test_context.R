@@ -27,4 +27,13 @@ dc <- rast(tg); values(dc) <- ifelse(ctx$lat > -60, 0L, 100L)
 ow <- openwater_summary(chl, dc, ctx, as.Date("2015-12-03"), 2015)
 stopifnot(all(ow$lat_band >= -60), all(ow$med == -0.5), sum(ow$ncell) == sum(ctx$lat > -60))
 print(head(ow))
+## depth via gdalwarp from a geographic source with overviews
+g <- rast(ext = c(-180, 180, -90, 90), res = 0.1, crs = "EPSG:4326")
+values(g) <- -1000 * (init(g, "y")[] < -60) - 4000 * (init(g, "y")[] >= -60)
+src <- tempfile(fileext = ".tif")
+writeRaster(g, src, filetype = "COG", gdal = "OVERVIEWS=AUTO")
+ctx2 <- cell_context(tg, src)
+dd <- ctx2$depth[!is.na(ctx2$depth)]
+stopifnot(all(ctx2$depth[ctx2$lat < -62] == -1000, na.rm = TRUE),
+          all(ctx2$depth[ctx2$lat > -58 & ctx2$lat < -40] == -4000, na.rm = TRUE))
 cat("context tests pass\n")

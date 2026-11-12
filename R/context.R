@@ -26,17 +26,32 @@ sector_of <- function(lon) {
 }
 
 ## bathy: optional GDAL source of elevation (negative below sea level), e.g.
-## a GEBCO COG or VRT; averaged onto the grid
+## sds::gebco() ("/vsicurl/.../GEBCO_2026.tif"); averaged onto the grid
 cell_context <- function(template, bathy = NULL) {
   cell <- seq_len(terra::ncell(template))
   xy <- terra::xyFromCell(template, cell)
   ll <- terra::project(xy, from = terra::crs(template), to = "EPSG:4326")
   out <- data.frame(cell = cell, lon = ll[, 1], lat = ll[, 2], sector = sector_of(ll[, 1]))
-  if (!is.null(bathy)) {
-    b <- terra::project(terra::rast(bathy), template, method = "average")
-    out$depth <- terra::values(b)[, 1]
-  }
+  if (!is.null(bathy)) out$depth <- terra::values(warp_average(bathy, template))[, 1]
   out
+}
+
+## average a (possibly remote, global) raster onto the template with the
+## gdalwarp CLI, letting GDAL pick a suitable overview (-ovr AUTO) so a
+## 15 arc-second global source is not read at full resolution
+warp_average <- function(src, template) {
+  dst <- tempfile(fileext = ".tif")
+  crs_file <- tempfile(fileext = ".wkt")
+  writeLines(terra::crs(template), crs_file)
+  e <- as.vector(terra::ext(template))
+  status <- system2("gdalwarp", c(
+    "-q", "-overwrite", "-r", "average", "-ovr", "AUTO",
+    "-t_srs", crs_file,
+    "-te", e[["xmin"]], e[["ymin"]], e[["xmax"]], e[["ymax"]],
+    "-ts", terra::ncol(template), terra::nrow(template),
+    "-ot", "Float32", shQuote(src), dst))
+  if (status != 0) stop("gdalwarp failed for ", src)
+  terra::rast(dst)
 }
 
 ## dates: the days of the composite. reader(dates) must return a SpatRaster
