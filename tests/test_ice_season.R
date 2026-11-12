@@ -10,13 +10,14 @@ m <- rbind(
   d = mk(1:365),                   # perennial: adv 1, ret NA
   e = mk(integer(0)),              # open water: all NA except daycount 0
   f = rep(NA_real_, nd),           # land
-  g = mk(c(1:30, 200:365))         # ice at start and end
+  g = mk(c(1:30, 200:365)),        # ice at start and end
+  h = mk(c(40, 41, 200))           # isolated ice days, no season: all NA
 )
 s <- ice_season(m)
 print(cbind(cell = rownames(m), s))
-stopifnot(identical(s$advance, c(100L,100L,100L,1L,NA,NA,1L)),
-          identical(s$retreat, c(251L,251L,303L,NA,NA,NA,NA)),
-          identical(s$daycount, c(151L,154L,154L,365L,0L,NA,196L)))
+stopifnot(identical(s$advance, c(100L,100L,100L,1L,NA,NA,1L,NA)),
+          identical(s$retreat, c(251L,251L,303L,NA,NA,NA,NA,NA)),
+          identical(s$daycount, c(151L,154L,154L,365L,0L,NA,196L,3L)))
 ## two-daily interpolation and gap rule
 obs <- d[seq(1, 365, by = 2)]
 mm <- m[1:2, seq(1, 365, by = 2)]

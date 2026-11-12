@@ -18,7 +18,8 @@ concentration (NSIDC 25 km, southern hemisphere, via raadtools for now).
   concentration at or above the threshold (default 15%).
 - **Retreat**: first day after the last day at or above the threshold, i.e.
   concentration stays below the threshold from this day to the end of the ice
-  year. NA if there is ice on the last day of the ice year (no retreat).
+  year. NA if there is ice on the last day of the ice year (no retreat), or if
+  there was no advance (no ice season, e.g. isolated spurious ice days).
 - **Duration**: retreat - advance.
 - **Daycount**: number of days at or above the threshold.
 - **Flags**: `ice_at_start`, `ice_at_end` (0/1) and `n_missing` (days with no

@@ -16,6 +16,8 @@
 ##  * a season with an observation gap longer than max_gap days is not
 ##    computed (all NA) rather than interpolated across (e.g. 1987-12 to 1988-01)
 ##  * shorter gaps (the two-daily early record) are linearly interpolated
+##  * retreat is only defined where there was an ice season (an advance), so
+##    isolated ice days in open water do not produce a retreat
 ##  * flags ice_at_start / ice_at_end and n_missing are written alongside, so
 ##    perennial-ice pixels can be excluded downstream rather than encoded
 ##    in the values
@@ -80,6 +82,9 @@ ice_season <- function(m, threshold = 15, ndays = 5L) {
   ice_at_end <- ice[, nd]
   retreat <- last_ice + 1L
   retreat[!any_ice | ice_at_end] <- NA_integer_
+  ## no ice season (no run of ndays), no retreat: stops isolated ice days
+  ## (weather effects in open water, coastal spillover) producing a retreat
+  retreat[!has_run] <- NA_integer_
 
   out <- data.frame(
     advance = as.integer(advance),

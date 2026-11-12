@@ -6,6 +6,25 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-12 (d) - 2001 comparison with old rds
+
+- CRS: old rds carries a proj4 string (Hughes ellipsoid, lat_ts -70), the CDR
+  read is tagged EPSG:3412 - same grid; `set.crs(old, crs(y))` then
+  `compareGeom()` is TRUE.
+- retreat(new) - retreat(old): peak at +1 (12448 cells) as expected from the
+  off-by-one; a long positive tail (+2: 6271, +3: 3270) - the CDR takes the
+  greater of NASA Team and Bootstrap concentration, so ice reads higher and
+  retreat comes later than with NASA Team alone. Algorithm, not code.
+- 4253 cells were retreat = 1 in the old output (the day-1 bug: perennial or
+  end-of-year ice) and are NA in the new.
+- New map showed scattered retreat values in open water beyond the pack:
+  isolated spurious ice days. Fix: retreat now NA where there is no advance
+  (no run of 5 ice days). Test case added.
+
+Next: `git pull`, rerun 2001 to confirm the speckle is gone, then full run.
+
+---
+
 ## 2026-11-12 (c) - Nectar run, logged from cloud workspace
 
 2001 reran fine: 365 obs, vmin 0 / vmax 100 after scaling, status ok.
