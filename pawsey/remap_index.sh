@@ -12,7 +12,9 @@ curl -fsS -o mdim-published.vrt "$INDEX_URL"
 n_from=$(grep -o "$MIRROR_FROM" mdim-published.vrt | wc -l)
 sed "s#$MIRROR_FROM#$MIRROR_TO#g" mdim-published.vrt > mdim-mirror.vrt.tmp
 n_to=$(grep -o "$MIRROR_TO" mdim-mirror.vrt.tmp | wc -l)
-n_left=$(grep -o "$MIRROR_FROM" mdim-mirror.vrt.tmp | wc -l)
+## MIRROR_TO usually starts with MIRROR_FROM (both /vsicurl/https://), so
+## "left" = references with the source prefix that are not the mirror's
+n_left=$(( $(grep -o "$MIRROR_FROM" mdim-mirror.vrt.tmp | wc -l) - n_to ))
 echo "references to source prefix: $n_from; remapped: $n_to; left on source: $n_left"
 ## sample 20 remapped files and check they exist on the mirror (HEAD)
 miss=0
