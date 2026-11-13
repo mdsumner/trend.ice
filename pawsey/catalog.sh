@@ -10,14 +10,15 @@ curl -fsS -o icefiles-src.parquet "$CATALOG_URL"
 ## built without zstd: re-encode to snappy (pyarrow, else GDAL's Parquet
 ## driver), keeping the columns as they are
 rm -f icefiles.parquet
-$RUN python3 -c "
+if $RUN python3 -c "
 import pyarrow.parquet as pq
 t = pq.read_table('icefiles-src.parquet')
 pq.write_table(t, 'icefiles.parquet', compression='snappy')
 print('re-encoded with pyarrow', t.num_rows, 'rows')
-" 2>/dev/null || \
-$RUN ogr2ogr -f Parquet -lco COMPRESSION=SNAPPY icefiles.parquet icefiles-src.parquet \
-  && echo "re-encoded with GDAL (ogr2ogr)"
+" 2>/dev/null; then :
+elif $RUN ogr2ogr -f Parquet -lco COMPRESSION=SNAPPY icefiles.parquet icefiles-src.parquet; then
+  echo "re-encoded with GDAL (ogr2ogr)"
+fi
 [ -s icefiles.parquet ] || { echo "could not re-encode the catalog (no pyarrow, no GDAL Parquet with zstd)" >&2; exit 1; }
 $RUN Rscript - <<'R'
 f <- arrow::read_parquet("icefiles.parquet")

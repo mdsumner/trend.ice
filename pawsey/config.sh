@@ -9,6 +9,9 @@ mkdir -p "$WORK"
 ## index (mdim VRT over the original netCDF files) and its grist catalog
 SRC=${SRC:-cdr-sic}                      # grist source name (fraction 0-1)
 TRANSFORM=${TRANSFORM:-unit_interval}    # drops CDR flags (2.51..2.55)
+## the index exposes x/y but not the CDR grid mapping, so the CRS is given
+## here: NSIDC Sea Ice Polar Stereographic South (as the ice season COGs)
+CRS=${CRS:-EPSG:3412}
 CATALOG_URL=${CATALOG_URL:-https://data.source.coop/ausantarctic/ausantarctic-scratch/seaice/g02202-v6-daily-south/grist/catalog.parquet}
 BUCKET=${BUCKET:-pawsey1197:aad-derived/trend-ice/s2}   # sums published here
 REGISTRY_URL=${REGISTRY_URL:-https://projects.pawsey.org.au/aad-derived/trend-sst/s2_registry.parquet}
@@ -28,4 +31,4 @@ GRIST_REF=${GRIST_REF:-hypertidy/grist@mdim-projected}
 export GDAL_CACHEMAX=256
 export GDAL_PAM_ENABLED=NO
 export GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR
-export SRC TRANSFORM WORK REPO
+export SRC TRANSFORM CRS WORK REPO

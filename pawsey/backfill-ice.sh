@@ -21,7 +21,8 @@ library(arrow)      # FIRST, before anything loads GDAL
 library(grist)
 reg <- read_parquet("s2_registry.parquet")
 files <- read_parquet("icefiles.parquet")
-src <- stat_source(Sys.getenv("SRC"), files, transform = Sys.getenv("TRANSFORM"))
+src <- stat_source(Sys.getenv("SRC"), files, transform = Sys.getenv("TRANSFORM"),
+                   grid = list(projection = Sys.getenv("CRS")))
 backfill(src, reg, workers = as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "24")))
 R
 module load rclone/1.68.1

@@ -19,7 +19,8 @@ $RUN Rscript - <<'R'
 library(arrow); library(grist)
 reg <- read_parquet("s2_registry.parquet")
 files <- read_parquet("icefiles.parquet")
-src <- stat_source(Sys.getenv("SRC"), files, transform = Sys.getenv("TRANSFORM"))
+src <- stat_source(Sys.getenv("SRC"), files, transform = Sys.getenv("TRANSFORM"),
+                   grid = list(projection = Sys.getenv("CRS")))
 str(src$grid)
 stopifnot(src$shape == "mdim", isTRUE(src$grid$projected),
           identical(src$grid$dimension, c(316L, 332L)))
