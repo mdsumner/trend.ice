@@ -14,6 +14,6 @@ t "gdalraster mdim"    $RUN Rscript -e 'cat("gdalraster", format(packageVersion(
 t "sf + jsonlite"      $RUN Rscript -e 'library(sf); library(jsonlite); cat("ok")'
 t "mdim info (array)"  $RUN Rscript -e "j <- jsonlite::fromJSON(gdalraster::mdim_info('$VRT', 'cdr_seaice_conc', cout = FALSE, pretty = FALSE)); cat(unlist(j\$dimensions))"
 CAT=/vsicurl/https://data.source.coop/ausantarctic/ausantarctic-scratch/seaice/g02202-v6-daily-south/grist/catalog.parquet
-t "pyarrow zstd"       $RUN python3 -c "import pyarrow.parquet as pq, pyarrow; print(pyarrow.__version__, pq.read_table('${CAT#/vsicurl/}'.replace('https://','https://')) if False else 'import ok', pyarrow.Codec.is_available('zstd'))"
+t "pyarrow zstd"       $RUN python3 -c "import pyarrow; print(pyarrow.__version__, 'zstd', pyarrow.Codec.is_available('zstd'))"
 t "GDAL parquet read"  $RUN ogrinfo -so -ro $CAT
 t "python mdim"        $RUN python3 -c "from osgeo import gdal; gdal.UseExceptions(); d=gdal.OpenEx('$VRT', gdal.OF_MULTIDIM_RASTER); a=d.GetRootGroup().OpenMDArray('cdr_seaice_conc'); print(gdal.__version__, [x.GetName() for x in a.GetDimensions()], [x.GetSize() for x in a.GetDimensions()])"
