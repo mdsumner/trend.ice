@@ -25,7 +25,20 @@ reg <- read_parquet("s2_registry.parquet")
 files <- read_parquet("icefiles.parquet")
 src <- stat_source(Sys.getenv("SRC"), files, transform = Sys.getenv("TRANSFORM"),
                    grid = list(projection = Sys.getenv("CRS")))
-backfill(src, reg, workers = as.integer(Sys.getenv("WORKERS", "12")))
+## workers are recycled every CHUNK dates (fresh processes per chunk): the
+## first full run at 54 workers grew steadily to 96 GB over 70 min (a
+## per-date leak in the read path), so no worker lives long enough for it
+## to matter. Each chunk starts and stops its own mirai daemons.
+chunk <- as.integer(Sys.getenv("CHUNK", "1000"))
+todo <- plan_dates(src)
+message(sprintf("[%s] %i of %i dates to do, in chunks of %i", src$name,
+                nrow(todo), nrow(src$files), chunk))
+keep <- which(as.Date(src$files$date) %in% todo$date)
+for (k in split(keep, ceiling(seq_along(keep) / chunk))) {
+  s1 <- src; s1$files <- src$files[k, ]
+  backfill(s1, reg, workers = as.integer(Sys.getenv("WORKERS", "12")))
+  gc()
+}
 R
 module load rclone/1.68.1
 rclone copy --checksum sums/ $BUCKET/sums/ || echo "WARNING: sums copy FAILED" >&2

@@ -36,4 +36,6 @@ export GDAL_LOAD_EXTRA_DIM_METADATA_DELAY=0
 ## each worker holds R + arrow + GDAL + the parsed index; set from
 ## pawsey/memprobe.sh (workers ~ 0.8 * job memory / per-worker MB)
 WORKERS=${WORKERS:-12}
-export SRC TRANSFORM CRS WORK REPO WORKERS
+## dates per chunk; workers are fresh processes per chunk (bounds a leak)
+CHUNK=${CHUNK:-1000}
+export SRC TRANSFORM CRS WORK REPO WORKERS CHUNK
