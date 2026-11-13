@@ -21,6 +21,9 @@ February.
 Retreat is the first day after which concentration stays below 15% for the
 rest of the ice year; trends are least squares over all available years
 (the 1987 ice year is excluded by a gap in the passive microwave record).
+The well-known dipole shows clearly: much earlier retreat west of the
+Antarctic Peninsula (Bellingshausen and Amundsen seas), later retreat over
+much of the Ross Sea sector.
 
 ## The bloom after retreat
 
@@ -37,6 +40,20 @@ rest of the ice year; trends are least squares over all available years
 Off-shelf cells with at least 5 seasons (10 for the year-to-year map);
 pixels with sea ice within ~75 km during a composite are excluded from the
 bloom metrics.
+
+The year-to-year map explains why the overall correlation between retreat
+timing and bloom peak is near zero: it is the sum of coherent regions of
+opposite sign. In much of the outer pack, where retreat comes in spring, a
+*later* than usual retreat goes with a *bigger* peak (red) - more light and
+shallower mixing by the time the ice goes. Further south, where retreat is
+already late, a later retreat goes with a *smaller* peak (blue) - less of
+the season left. The highest peaks sit along the coast and shelf break of
+the Weddell and Ross seas.
+
+::: {.callout-note}
+A one-cell seam along 180 degrees longitude (bottom centre) is an artefact of
+regridding the chlorophyll at the antimeridian, to be fixed.
+:::
 
 ## Trends on S2 cells (coming)
 

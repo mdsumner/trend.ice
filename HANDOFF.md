@@ -8,6 +8,27 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-14 (a) - site live with real maps
+
+Pages enabled; site at https://mdsumner.github.io/trend.ice/ built from
+`221b876` (Site maps). Read of the maps:
+
+- retreat trend 1979-2025 shows the known dipole: strongly earlier west of
+  the Peninsula (Bellingshausen / Amundsen), later over the Ross sector
+- bloom peak highest along the Weddell and Ross coast / shelf break
+- year-to-year sensitivity map: coherent regions of opposite sign - outer
+  pack (spring retreat) later -> bigger peak; inner zone (summer retreat)
+  later -> smaller. Explains the near-zero pooled correlation; text added
+  to the site.
+
+To fix: one-cell seam at the antimeridian in the chl regrid
+(`chl_on_icegrid()` crops the source to -180..180 before projecting; cells
+straddling 180 get no / partial data). Fix by padding the source across
+the dateline (or warping with explicit wrap) and rerunning the chl tables
+- low priority, cosmetic for curves, visible on maps.
+
+---
+
 ## 2026-11-13 (v) - write-up and Pages site
 
 Added a Quarto site in `site/` (Overview, Maps, Results, Methods, Data),

@@ -35,10 +35,12 @@ records (sea surface temperature, sea level, chlorophyll, and now sea ice).
   the bloom peak for early retreats (strongest in the Ross and
   Bellingshausen-Amundsen sectors); for summer retreats, already shallow and
   well lit, the physical state explains little.
-- **Year-to-year variation at a place is only weakly explained** by
-  timing, mixing, temperature or salinity. An earlier than usual retreat
-  lowers the peak in the Weddell and Ross seas by about 15%. The likely
-  missing driver is iron supply.
+- **Year to year, the effect of retreat timing changes sign with place.**
+  In the outer pack (spring retreat) a later than usual retreat gives a
+  bigger bloom; further south (summer retreat) a later retreat gives a
+  smaller one. Pooled, these cancel. Mixing, temperature and salinity
+  explain little of the year-to-year variation; the likely missing driver
+  is iron supply.
 
 See [Maps](maps.qmd) for where, [Results](results.qmd) for the curves
 behind these statements, [Methods](methods.qmd) for how, and
