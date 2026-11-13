@@ -5,7 +5,20 @@
 set -eu
 source "$(dirname "$0")/config.sh"
 cd "$WORK"
-curl -fsS -o icefiles.parquet.tmp "$CATALOG_URL" && mv icefiles.parquet.tmp icefiles.parquet
+curl -fsS -o icefiles-src.parquet "$CATALOG_URL"
+## the published catalog is zstd-compressed and the container's R arrow is
+## built without zstd: re-encode to snappy (pyarrow, else GDAL's Parquet
+## driver), keeping the columns as they are
+rm -f icefiles.parquet
+$RUN python3 -c "
+import pyarrow.parquet as pq
+t = pq.read_table('icefiles-src.parquet')
+pq.write_table(t, 'icefiles.parquet', compression='snappy')
+print('re-encoded with pyarrow', t.num_rows, 'rows')
+" 2>/dev/null || \
+$RUN ogr2ogr -f Parquet -lco COMPRESSION=SNAPPY icefiles.parquet icefiles-src.parquet \
+  && echo "re-encoded with GDAL (ogr2ogr)"
+[ -s icefiles.parquet ] || { echo "could not re-encode the catalog (no pyarrow, no GDAL Parquet with zstd)" >&2; exit 1; }
 $RUN Rscript - <<'R'
 f <- arrow::read_parquet("icefiles.parquet")
 d <- as.Date(f$date)
