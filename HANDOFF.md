@@ -4,6 +4,8 @@ Running log between sessions and machines (claude.ai cloud workspace, Nectar
 VM, Setonix). Newest entry at the top. Each entry: date, where, what was done,
 what is next, anything blocking. Keep entries short; detail goes in commits.
 
+Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
+
 ---
 
 ## 2026-11-13 (p) - BRAN check looks right; Acacia write probe
