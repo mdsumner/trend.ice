@@ -52,6 +52,21 @@ Published to Pawsey Acacia by `scripts/publish.sh`:
 
     s3://aad-derived/trend-ice/iceseason_t15/   (endpoint https://projects.pawsey.org.au)
 
+## Where the data lives
+
+Acacia is the home for everything trend.ice creates, under
+`s3://aad-derived/trend-ice/` (endpoint https://projects.pawsey.org.au,
+anonymous read):
+
+| prefix | what | made on |
+|---|---|---|
+| `iceseason_t15/` | ice season COGs + manifest | Nectar (`scripts/publish.sh`) |
+| `chl_dsr_v1/`, `chl_dsr_v2/` | chl vs days-since-retreat tables, open-water baseline, cells | Nectar (`scripts/publish_acacia.sh`) |
+| `bran5day/` | BRAN 5-day composites (NetCDF, native grid) | Gadi (`gadi/publish.sh`) |
+| `bran_icegrid/` | BRAN composites on the ice grid, (cell, mid) tables | Gadi (`gadi/publish.sh`) |
+
+Local copies on Nectar or Gadi are working caches.
+
 ## Run
 
 On a machine that sees the raadtools ice collection:

@@ -6,6 +6,24 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (l) - Acacia is home
+
+Decision: Acacia (`s3://aad-derived/trend-ice/`) is the home for everything
+we create; Nectar / Gadi copies are caches. README has the layout table.
+
+Added `scripts/publish_acacia.sh` (Nectar, AWS CLI) and `gadi/publish.sh`
+(Gadi copyq, `gdal vsi sync` with AWS_PROFILE=pawsey1197 - needs
+~/.aws/credentials with that profile on Gadi).
+
+Next:
+
+- Nectar: `scripts/publish_acacia.sh ~/trend-ice-chl-v2 chl_dsr_v2`
+  (and `~/trend-ice-chl chl_dsr_v1`)
+- Gadi, after `gadi/bran.sh`: `qsub gadi/publish.sh`
+- the BRAN join then reads both from Acacia (anywhere)
+
+---
+
 ## 2026-11-13 (k) - BRAN composite step written
 
 Remap job resubmitted on Gadi (183806081).
