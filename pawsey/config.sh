@@ -18,9 +18,12 @@ INDEX_URL=${INDEX_URL:-https://data.source.coop/ausantarctic/ausantarctic-scratc
 ## the source URL's host and path, as raad keeps them). When MIRROR_TO is
 ## set, pawsey/remap_index.sh writes WORK/mdim-mirror.vrt and the catalog
 ## reads through it. Empty = read from NSIDC through the published index.
-MIRROR_FROM=${MIRROR_FROM:-/vsicurl/https://noaadata.apps.nsidc.org/}
+## The mirror keeps host + path, so one rule covers every source host
+## (NSIDC CDR north/south, Bremen ASI):
+##   /vsicurl/https://<host>/<path>  ->  $MIRROR_TO<host>/<path>
+MIRROR_FROM=${MIRROR_FROM:-/vsicurl/https://}
 MIRROR_TO=${MIRROR_TO:-}
-## e.g. MIRROR_TO=/vsicurl/https://projects.pawsey.org.au/aad-derived/raad-scratch/noaadata.apps.nsidc.org/
+## e.g. MIRROR_TO=/vsicurl/https://projects.pawsey.org.au/aad-derived/raad-scratch/
 BUCKET=${BUCKET:-pawsey1197:aad-derived/trend-ice/s2}   # sums published here
 REGISTRY_URL=${REGISTRY_URL:-https://projects.pawsey.org.au/aad-derived/trend-sst/s2_registry.parquet}
 
