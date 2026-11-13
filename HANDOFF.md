@@ -6,6 +6,34 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (k) - BRAN composite step written
+
+Remap job resubmitted on Gadi (183806081).
+
+Added (tested on synthetic data, `tests/test_bran_composites.py`,
+`tests/test_bran_icegrid.py`):
+
+- `scripts/bran_composites.py`: opens the /g/data-remapped kerchunk stores,
+  averages daily mld, surface temp and surface salt (st_ocean[0]) over each
+  OC-CCI 5-day composite (starts doy 1, 6, 11, ... - checked against the
+  file dates), south of 48S, lon rolled to -180..180; one NetCDF per year
+  with `ndays` per composite.
+- `scripts/bran_to_icegrid.R`: averages each composite onto the 25 km ice
+  grid; table cell, mid, mld, temp, salt for mid-dates Sep-Apr.
+- `gadi/bran.sh`: runs both (normal queue, gdata/jk72+gdata/gb6), output in
+  /g/data/jk72/mds581/trend-ice/{bran5day,bran_icegrid}.
+
+Next (Gadi), after the remap job reports clean:
+
+    git pull && qsub gadi/bran.sh
+
+Open question: the chl tables are on Nectar, the BRAN tables will be on
+Gadi. Either move the BRAN tables to Acacia (copyq) and join on Nectar, or
+bring the chl tables to Gadi. Sizes: BRAN tables maybe a few GB over the
+record; chl v2 tables a few hundred MB.
+
+---
+
 ## 2026-11-13 (j) - remap fix: no pyarrow S3 needed
 
 First `remap_bran.sh` run failed for all three: the image's pyarrow is built
