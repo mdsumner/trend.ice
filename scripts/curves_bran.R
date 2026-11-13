@@ -1,16 +1,22 @@
 ## Join the chl tables (context run) with BRAN on the ice grid, and ask whether
-## the physical state at retreat explains the bloom.
+## the physical state at and after retreat explains the bloom.
 ##
 ##   Rscript scripts/curves_bran.R CHLDIR BRANDIR [outdir=trend-ice-curves-bran]
 ##
 ## CHLDIR: chl_dsr_<y>, cells (run_chl_context.R); BRANDIR: bran_icegrid_<y>
-## (bran_to_icegrid.R). Off-shelf, clean rows (no ice within ~75 km).
-## Per cell-year "at retreat" = mean over dsr -5..5 of mld, temp, salt.
-## Bloom amplitude per cell-year = max log10 chl over dsr 0..60 minus mean
-## over dsr -30..-1 (>= 3 composites each side).
-## Writes: curves by retreat timing x MLD-at-retreat tercile (terciles within
-## each timing class, so timing and MLD are not confounded), amplitude
-## summaries and rank correlations, csv + png.
+## (bran_to_icegrid.R). Off-shelf cells only.
+##
+## Per cell-year (retreat day R from the chl rows):
+##   BRAN state, read from the BRAN tables directly (not limited to rows with
+##   usable chl, which near retreat are mostly ice-adjacent):
+##     *_at   mean over composites with mid in R-5 .. R+5
+##     *_post mean over composites with mid in R .. R+20 (the stratifying layer)
+##   bloom, from clean chl rows (no ice within ~75 km):
+##     peak  max log10 chl over dsr 0..60 (>= 3 composites)
+##     pre   mean log10 chl over dsr -30..-1 from all rows (>= 2), so
+##     amp   = peak - pre where available
+## MLD terciles are taken within each retreat-timing tercile, so timing and
+## MLD are not confounded. Writes summaries, rank correlations and curves.
 
 source("R/curves.R")
 args <- commandArgs(trailingOnly = TRUE)
@@ -27,72 +33,94 @@ find1 <- function(dir, stem) {
 }
 
 cells <- read_any(find1(chldir, "cells"))
-years <- as.integer(sub("^chl_dsr_([0-9]{4})\\..*$", "\\1",
-                        list.files(chldir, pattern = "^chl_dsr_[0-9]{4}\\.")))
-parts <- list()
-for (y in sort(years)) {
+offshelf <- if ("depth" %in% names(cells)) cells$cell[!is.na(cells$depth) & cells$depth <= -1000] else cells$cell
+years <- sort(as.integer(sub("^chl_dsr_([0-9]{4})\\..*$", "\\1",
+                             list.files(chldir, pattern = "^chl_dsr_[0-9]{4}\\."))))
+rows <- list(); cys <- list()
+for (y in years) {
   ch <- read_any(find1(chldir, sprintf("chl_dsr_%d", y)))
-  ch <- ch[!is.na(ch$ice_near) & ch$ice_near == 0, c("cell", "ice_year", "mid", "dsr", "log10chl")]
+  ch <- ch[ch$cell %in% offshelf, c("cell", "ice_year", "mid", "dsr", "log10chl", "ice_near")]
   ch$mid <- as.Date(ch$mid)
+  ch$clean <- !is.na(ch$ice_near) & ch$ice_near == 0
+  ## retreat date per cell-year
+  ch$rdate <- ch$mid - ch$dsr
+  cy <- unique(ch[c("cell", "ice_year", "rdate")])
+  ## BRAN state from the BRAN tables, calendar years y and y + 1
   bf <- na.omit(c(find1(brandir, sprintf("bran_icegrid_%d", y)), find1(brandir, sprintf("bran_icegrid_%d", y + 1L))))
-  if (!length(bf)) { message(y, ": no BRAN"); next }
-  br <- do.call(rbind, lapply(bf, read_any))
-  br$mid <- as.Date(br$mid)
-  br <- br[br$cell %in% ch$cell, ]
-  j <- merge(ch, br, by = c("cell", "mid"), all.x = TRUE)
-  message(y, ": ", nrow(j), " rows, ", round(100 * mean(!is.na(j$mld))), "% with BRAN")
-  parts[[length(parts) + 1]] <- j
+  if (length(bf)) {
+    br <- do.call(rbind, lapply(bf, read_any))
+    br$mid <- as.Date(br$mid)
+    br <- br[br$cell %in% cy$cell, ]
+    b <- merge(br, cy, by = "cell")
+    b$d <- as.integer(b$mid - b$rdate)
+    agg <- function(sel, suffix) {
+      x <- b[sel, ]
+      k <- paste(x$cell, x$ice_year)
+      out <- data.frame(key = unique(k))
+      for (v in c("mld", "temp", "salt")) out[[paste0(v, suffix)]] <- tapply(x[[v]], k, mean, na.rm = TRUE)[out$key]
+      out
+    }
+    st <- merge(agg(b$d >= -5 & b$d <= 5, "_at"), agg(b$d >= 0 & b$d <= 20, "_post"), by = "key", all = TRUE)
+    cy$key <- paste(cy$cell, cy$ice_year)
+    cy <- merge(cy, st, by = "key", all.x = TRUE)
+  }
+  message(y, ": ", nrow(cy), " cell-years, ", round(100 * mean(!is.na(cy$mld_post))), "% with BRAN after retreat")
+  rows[[length(rows) + 1]] <- ch[, c("cell", "ice_year", "mid", "dsr", "log10chl", "clean")]
+  cys[[length(cys) + 1]] <- cy
 }
-tab <- do.call(rbind, parts)
-ci <- match(tab$cell, cells$cell)
-if ("depth" %in% names(cells)) tab <- tab[!is.na(cells$depth[ci]) & cells$depth[ci] <= -1000, ]
+tab <- do.call(rbind, rows)
+cy <- do.call(rbind, cys)
+cy$key <- paste(cy$cell, cy$ice_year)
+tab$key <- paste(tab$cell, tab$ice_year)
+
+## timing terciles (all rows), bloom metrics
 tab$timing <- retreat_timing(tab)$timing
+post <- tab[tab$clean & tab$dsr >= 0 & tab$dsr <= 60, ]
+pre <- tab[tab$dsr >= -30 & tab$dsr <= -1, ]
+np <- table(post$key); nq <- table(pre$key)
+cy$peak <- tapply(post$log10chl, post$key, max)[cy$key]
+cy$peak[is.na(np[cy$key]) | np[cy$key] < 3] <- NA
+cy$pre <- tapply(pre$log10chl, pre$key, mean)[cy$key]
+cy$pre[is.na(nq[cy$key]) | nq[cy$key] < 2] <- NA
+cy$amp <- cy$peak - cy$pre
+cy$timing <- tab$timing[match(cy$key, tab$key)]
+d <- cy[!is.na(cy$peak) & !is.na(cy$mld_post) & !is.na(cy$timing), ]
+message(nrow(d), " cell-years with a bloom peak and BRAN after retreat; ",
+        sum(!is.na(d$amp)), " also with a pre-retreat level")
 
-## state at retreat and bloom amplitude per cell-year
-key <- paste(tab$cell, tab$ice_year)
-at <- tab[tab$dsr >= -5 & tab$dsr <= 5, ]
-akey <- paste(at$cell, at$ice_year)
-state <- data.frame(key = unique(akey))
-for (v in c("mld", "temp", "salt")) state[[v]] <- tapply(at[[v]], akey, mean, na.rm = TRUE)[state$key]
-pre <- tab[tab$dsr >= -30 & tab$dsr <= -1, ]; post <- tab[tab$dsr >= 0 & tab$dsr <= 60, ]
-pk <- paste(pre$cell, pre$ice_year); qk <- paste(post$cell, post$ice_year)
-amp <- data.frame(key = intersect(names(which(table(pk) >= 3)), names(which(table(qk) >= 3))))
-amp$pre <- tapply(pre$log10chl, pk, mean)[amp$key]
-amp$peak <- tapply(post$log10chl, qk, max)[amp$key]
-amp$amp <- amp$peak - amp$pre
-cy <- merge(amp, state, by = "key")
-cy$timing <- tab$timing[match(cy$key, key)]
-cy <- cy[!is.na(cy$mld) & !is.na(cy$timing), ]
-message(nrow(cy), " cell-years with amplitude and state at retreat")
-
-## MLD terciles within each timing class
-cy$mld_t <- NA_character_
-for (tm in levels(cy$timing)) {
-  i <- which(cy$timing == tm)
-  b <- quantile(cy$mld[i], c(1/3, 2/3), na.rm = TRUE)
-  cy$mld_t[i] <- as.character(cut(cy$mld[i], c(-Inf, b, Inf), labels = c("shallow", "mid", "deep")))
+## MLD (after retreat) terciles within each timing class
+d$mld_t <- NA_character_
+for (tm in levels(d$timing)) {
+  i <- which(d$timing == tm)
+  b <- quantile(d$mld_post[i], c(1/3, 2/3), na.rm = TRUE)
+  d$mld_t[i] <- as.character(cut(d$mld_post[i], c(-Inf, b, Inf), labels = c("shallow", "mid", "deep")))
 }
-cy$mld_t <- factor(cy$mld_t, levels = c("shallow", "mid", "deep"))
+d$mld_t <- factor(d$mld_t, levels = c("shallow", "mid", "deep"))
 
 w <- function(x, name) utils::write.csv(x, file.path(outdir, paste0(name, ".csv")), row.names = FALSE)
-summ <- do.call(rbind, lapply(split(cy, list(cy$timing, cy$mld_t), drop = TRUE), function(d)
-  data.frame(timing = d$timing[1], mld_t = d$mld_t[1], n = nrow(d),
-             mld_med = median(d$mld), amp_med = median(d$amp),
-             amp_q25 = unname(quantile(d$amp, 0.25)), amp_q75 = unname(quantile(d$amp, 0.75)))))
-w(summ[order(summ$timing, summ$mld_t), ], "amplitude_by_timing_mld")
-cors <- do.call(rbind, lapply(split(cy, cy$timing), function(d)
-  data.frame(timing = d$timing[1], n = nrow(d),
-             rho_mld = suppressWarnings(cor(d$amp, d$mld, method = "spearman", use = "complete")),
-             rho_temp = suppressWarnings(cor(d$amp, d$temp, method = "spearman", use = "complete")),
-             rho_salt = suppressWarnings(cor(d$amp, d$salt, method = "spearman", use = "complete")))))
-w(cors, "amplitude_rank_correlations"); print(summ); print(cors)
+summ <- do.call(rbind, lapply(split(d, list(d$timing, d$mld_t), drop = TRUE), function(x)
+  data.frame(timing = x$timing[1], mld_t = x$mld_t[1], n = nrow(x),
+             mld_post_med = median(x$mld_post), temp_post_med = median(x$temp_post, na.rm = TRUE),
+             salt_post_med = median(x$salt_post, na.rm = TRUE),
+             peak_med = median(x$peak), n_amp = sum(!is.na(x$amp)), amp_med = median(x$amp, na.rm = TRUE))))
+summ <- summ[order(summ$timing, summ$mld_t), ]
+w(summ, "bloom_by_timing_mld")
+rho <- function(a, b) suppressWarnings(cor(a, b, method = "spearman", use = "complete.obs"))
+cors <- do.call(rbind, lapply(split(d, d$timing), function(x)
+  data.frame(timing = x$timing[1], n = nrow(x),
+             peak_mld = rho(x$peak, x$mld_post), peak_temp = rho(x$peak, x$temp_post),
+             peak_salt = rho(x$peak, x$salt_post),
+             n_amp = sum(!is.na(x$amp)), amp_mld = rho(x$amp, x$mld_post),
+             amp_temp = rho(x$amp, x$temp_post), amp_salt = rho(x$amp, x$salt_post))))
+w(cors, "bloom_rank_correlations")
+print(summ, row.names = FALSE); print(cors, row.names = FALSE)
 
-## curves by timing x MLD tercile
-tab$mld_t <- cy$mld_t[match(key, cy$key)]
-cv <- bin_curve(tab[!is.na(tab$mld_t), ], by = c("timing", "mld_t"))
+## curves by timing x MLD tercile (clean rows)
+tab$mld_t <- d$mld_t[match(tab$key, d$key)]
+cv <- bin_curve(tab[tab$clean & !is.na(tab$mld_t), ], by = c("timing", "mld_t"))
 w(cv, "curve_timing_mld")
 for (tm in levels(tab$timing)) {
   plot_curves(cv[cv$timing == tm, ], "mld_t", file.path(outdir, sprintf("curve_%s_by_mld.png", tm)),
-              sprintf("Off-shelf, %s retreat: by mixed layer depth at retreat", tm))
+              sprintf("Off-shelf, %s retreat: by mixed layer depth 0-20 days after retreat", tm))
 }
 message("done: ", outdir)

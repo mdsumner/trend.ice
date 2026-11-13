@@ -8,6 +8,34 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-13 (q) - first BRAN join: sample artefact; reworked
+
+First `curves_bran.R` run (Nectar): join fine (97-100% of chl rows matched
+BRAN, except ice year 2025 at 29% - the BRAN tables stop at calendar 2025,
+so Jan-Apr 2026 is missing). But only 1,083 cell-years qualified, and
+correlations were ~0. Cause: the "clean" filter (no ice within ~75 km)
+removes almost every row near retreat, and the old script took both the
+state at retreat and the pre-retreat level from clean chl rows only. Not a
+result - removed those outputs.
+
+Reworked `scripts/curves_bran.R` (test updated so rows near retreat are
+ice-adjacent, as in the real data):
+
+- BRAN state comes from the BRAN tables directly, by cell and retreat date:
+  `*_at` (R-5..R+5) and `*_post` (R..R+20, the stratifying window)
+- bloom `peak` = max clean log10 chl over dsr 0..60 (>= 3 composites);
+  `pre` from all rows (dsr -30..-1, >= 2); `amp` = peak - pre
+- MLD terciles (post-retreat) within each timing tercile; outputs
+  `bloom_by_timing_mld.csv`, `bloom_rank_correlations.csv`, curves
+
+Next:
+
+1. Gadi: `qsub -v FIRST=2026,LAST=2026 gadi/bran.sh`, then
+   `DIRS="bran5day bran_icegrid" qsub gadi/publish.sh` (adds 2026)
+2. Nectar: re-sync bran_icegrid, rerun curves_bran.R, push results
+
+---
+
 ## 2026-11-13 (p) - BRAN check looks right; Acacia write probe
 
 `check_bran.R` on 2015: 48 composites (mid 2015-01-03 .. 2015-12-29),
