@@ -1,5 +1,8 @@
 # trend.ice
 
+**Site:** <https://mdsumner.github.io/trend.ice/> (Quarto, `site/`; maps made by
+`scripts/make_maps.R`, published by `.github/workflows/pages.yml`).
+
 Southern Ocean sea ice seasonality - day of advance, day of retreat, ice season
 duration and day count - per pixel per ice year, as a member of the trend.*
 family of ocean climate records (trend.sst, trend.sla, trend.chl).

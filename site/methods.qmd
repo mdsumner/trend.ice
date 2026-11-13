@@ -1,0 +1,72 @@
+---
+title: "Methods"
+---
+
+## Sea ice seasonality
+
+Daily passive microwave sea ice concentration (the NOAA/NSIDC sea ice
+concentration climate data record, 25 km south polar stereographic grid)
+for 1979-2025. Following Massom et al. (2013), per pixel and per ice year
+(15 February to 14 February):
+
+- **advance**: first day of the first run of at least 5 consecutive days at
+  or above 15% concentration
+- **retreat**: first day after the last day at or above 15% (concentration
+  stays below 15% to the end of the ice year); undefined if there is ice on
+  the last day, or if there was no advance
+- **duration** = retreat - advance; **day count** = days at or above 15%
+
+Gaps of up to 5 days are interpolated; dates whose field is mostly empty
+are treated as missing; the 1987 ice year is not computed because of the
+SSM/I gap from 3 December 1987 to 13 January 1988. This reimplements an
+earlier calculation and fixes its handling of pixels with ice at the end of
+the year (previously given retreat day 1) and a one-day offset.
+
+## Chlorophyll on the ice grid
+
+Ocean colour: the merged multi-sensor 5-day chlorophyll-a composites
+(Ocean Colour CCI v6.0, 4 km). Each composite is averaged onto the 25 km
+ice grid as the mean of log~10~ chlorophyll, keeping an area-weighted count
+of valid 4 km pixels. Composites are dated by their mid-day (start + 2).
+
+For each composite with a mid-date from 1 September to 30 April and each
+cell with a retreat that ice year, days since retreat (dsr) = day of the
+ice year of the composite - retreat day; rows with dsr from -30 to 120 are
+kept. About 9.8 million cell-composites over 29 ice years.
+
+## Context
+
+- **Ice nearby:** maximum ice concentration over the composite's 5 days in
+  the cell and its 3x3 neighbourhood (~75 km); "clean" rows have none.
+- **Open-water baseline:** chlorophyll in cells with no ice season that
+  year, by composite, sector and 1-degree latitude band; each row is
+  compared with the same composite and sector, in its own band where open
+  water exists (the "near" baseline) or the nearest band.
+- **Shelf:** GEBCO bathymetry averaged onto the grid; shelf = shallower
+  than 1000 m.
+- **Sectors:** Weddell (60W-20E), Indian (20E-90E), West Pacific
+  (90E-160E), Ross (160E-130W), Bellingshausen-Amundsen (130W-60W).
+
+## Ocean state
+
+Daily mixed layer depth, surface temperature and surface salinity from the
+Bluelink ReANalysis (BRAN2020, 0.1 degree), read in place on the NCI
+supercomputer through kerchunk reference stores whose file paths were
+remapped from the public THREDDS URLs to the local file system. Averaged to
+the same 5-day calendar south of 48S and onto the ice grid, then
+summarised per cell-year over the 20 days after retreat.
+
+## Bloom metrics
+
+Per cell-year: **peak** = maximum log~10~ chlorophyll over dsr 0-60 from
+clean rows (at least 3 composites); **peak dsr** = its days since retreat.
+Rank (Spearman) correlations are reported pooled, within sector, and within
+cell (departures from each cell's mean over years, cells with at least 5
+years).
+
+## Reference
+
+Massom, R., Reid, P., Stammerjohn, S., Raymond, B., Fraser, A. and Ushio, S.
+(2013). Change and variability in East Antarctic sea ice seasonality,
+1979/80-2009/10. *PLoS ONE* 8(5): e64756.
+<https://doi.org/10.1371/journal.pone.0064756>

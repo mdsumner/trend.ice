@@ -1,0 +1,30 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "trend.ice"
+  description: "Southern Ocean sea ice seasonality and the ice-edge bloom"
+  repo-url: https://github.com/mdsumner/trend.ice
+  repo-actions: [source, issue]
+  navbar:
+    left:
+      - href: index.qmd
+        text: Overview
+      - href: maps.qmd
+        text: Maps
+      - href: results.qmd
+        text: Results
+      - href: methods.qmd
+        text: Methods
+      - href: data.qmd
+        text: Data
+    right:
+      - icon: github
+        href: https://github.com/mdsumner/trend.ice
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    fig-align: center

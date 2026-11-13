@@ -1,0 +1,59 @@
+---
+title: "Maps"
+---
+
+All maps are on the 25 km south polar stereographic sea ice grid
+(EPSG:3412). Day numbers are day of the "ice year", which starts on 15
+February.
+
+## Sea ice seasonality
+
+::: {layout-ncol=2}
+![Mean day of retreat](figures/ice_retreat_mean.png)
+
+![Trend in day of retreat (days per decade; positive = later)](figures/ice_retreat_trend.png)
+
+![Mean ice season duration](figures/ice_duration_mean.png)
+
+![Trend in ice season duration (days per decade; positive = longer)](figures/ice_duration_trend.png)
+:::
+
+Retreat is the first day after which concentration stays below 15% for the
+rest of the ice year; trends are least squares over all available years
+(the 1987 ice year is excluded by a gap in the passive microwave record).
+
+## The bloom after retreat
+
+::: {layout-ncol=2}
+![Median bloom peak (chlorophyll-a, 0-60 days after retreat)](figures/bloom_peak.png)
+
+![Days from retreat to the bloom peak (median)](figures/bloom_peak_dsr.png)
+
+![Year to year: rank correlation of bloom peak with retreat day at each place](figures/bloom_timing_sensitivity.png)
+
+![Mixed layer depth in the 20 days after retreat (ocean reanalysis, median)](figures/bran_mld_post.png)
+:::
+
+Off-shelf cells with at least 5 seasons (10 for the year-to-year map);
+pixels with sea ice within ~75 km during a composite are excluded from the
+bloom metrics.
+
+## Trends on S2 cells (coming)
+
+The trend.* records compute sufficient statistics on a discrete global grid
+(S2 cells), which gives exact, updatable trends from daily data without
+storing the daily fields. These panels are reserved for those trends in
+the same view as the seasonality and bloom maps above.
+
+::: {layout-ncol=2}
+![Sea surface temperature](figures/s2_trend_sst.png)
+
+![Chlorophyll](figures/s2_trend_chl.png)
+
+![Sea level anomaly](figures/s2_trend_sla.png)
+
+![Sea ice](figures/s2_trend_ice.png)
+:::
+
+Each panel is a fixed file name (`site/figures/s2_trend_<var>.png`); writing
+the real map to that name replaces the placeholder.

@@ -8,6 +8,37 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-13 (v) - write-up and Pages site
+
+Added a Quarto site in `site/` (Overview, Maps, Results, Methods, Data),
+rendered locally without errors, and `.github/workflows/pages.yml` (renders
+`site/`, deploys to Pages; no code runs in CI - figures are committed).
+
+Maps: `scripts/make_maps.R` (tested on synthetic data,
+`tests/test_make_maps.R`) writes fixed names into `site/figures/`:
+ice_retreat_mean / _trend, ice_duration_mean / _trend (from the ice season
+COGs), bloom_peak, bloom_peak_dsr, bloom_timing_sensitivity, bran_mld_post
+(from the per-cell-year table). Slots for S2 sufficient-statistics trends:
+s2_trend_{sst,chl,sla,ice}.png - placeholders until real maps are written
+to those names. `scripts/site_placeholders.R` made "pending" PNGs for all
+of them so the site builds now.
+
+`curves_bran.R` now also writes `cellyears.parquet` (one row per cell-year:
+retreat day, timing, peak, peak_dsr, pre, amp, BRAN state at / after
+retreat) and computes `peak_dsr`.
+
+Next (Nectar):
+
+    cd ~/Git/trend.ice && git pull
+    Rscript scripts/curves_bran.R ~/trend-ice-chl-v2 ~/bran_icegrid ~/trend-ice-curves-bran
+    Rscript scripts/make_maps.R ~/iceseason_v2 ~/trend-ice-curves-bran/cellyears.parquet site/figures
+    git add site/figures && git commit -m "Site maps" && git push
+    scripts/publish_acacia.sh ~/trend-ice-curves-bran curves_bran   # cellyears to Acacia
+
+GitHub: Settings > Pages > Source: "GitHub Actions" (once).
+
+---
+
 ## 2026-11-13 (u) - timing within cell, day length: read
 
 Retreat day varies ~12-24 d (sd) year to year at a place. Peak: earlier

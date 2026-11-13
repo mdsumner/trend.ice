@@ -3,3 +3,5 @@
 .Rproj.user/
 *.tif
 *.tif.aux.xml
+site/_site/
+site/.quarto/

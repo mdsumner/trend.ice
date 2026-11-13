@@ -1,0 +1,50 @@
+---
+title: "Data"
+---
+
+Everything this work creates lives in one object store prefix, readable
+anonymously:
+
+```
+s3://aad-derived/trend-ice/          endpoint: https://projects.pawsey.org.au
+```
+
+| prefix | contents |
+|---|---|
+| `iceseason_t15/` | ice season COGs, one per ice year (7 layers: advance, retreat, duration, daycount, ice_at_start, ice_at_end, n_missing) + manifest |
+| `chl_dsr_v1/`, `chl_dsr_v2/` | chlorophyll vs days-since-retreat tables per ice year (v2 adds ice-nearby flags), open-water baseline, cell table |
+| `bran5day/` | ocean reanalysis 5-day composites (NetCDF, native grid, south of 48S) |
+| `bran_icegrid/` | the same on the ice grid, as (cell, mid) tables |
+
+Reading an ice season layer with GDAL:
+
+```bash
+export AWS_S3_ENDPOINT=projects.pawsey.org.au AWS_NO_SIGN_REQUEST=YES AWS_VIRTUAL_HOSTING=NO
+gdalinfo /vsis3/aad-derived/trend-ice/iceseason_t15/south_iceseason_t15_2001-02-15.tif
+```
+
+or in R with the repository's helper:
+
+```r
+source("R/read_iceseason.R")
+ret <- read_iceseason("retreat", 1997:2025)   # one layer per ice year
+```
+
+## Code
+
+<https://github.com/mdsumner/trend.ice>: `R/` (seasonality, regridding,
+context, curves), `scripts/` (runs and analyses), `gadi/` (jobs run where
+the ocean reanalysis lives), `tools/` (kerchunk reference remapping),
+`tests/`, `results/` (tables and figures behind these pages) and
+`HANDOFF.md` (the running log).
+
+## Sources
+
+- Sea ice: NOAA/NSIDC Climate Data Record of Passive Microwave Sea Ice
+  Concentration (daily, 25 km).
+- Ocean colour: ESA Ocean Colour Climate Change Initiative, version 6.0
+  (5-day, 4 km, chlorophyll-a). Ocean Colour Climate Change Initiative
+  dataset, Version 6.0, European Space Agency, available online at
+  <https://climate.esa.int/en/projects/ocean-colour/>.
+- Ocean state: Bluelink ReANalysis (BRAN2020), daily.
+- Bathymetry: GEBCO gridded bathymetry.

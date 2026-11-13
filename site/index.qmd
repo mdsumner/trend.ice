@@ -1,0 +1,52 @@
+---
+title: "Sea ice retreat and the ice-edge bloom"
+subtitle: "Southern Ocean, 1997-2025"
+---
+
+When sea ice retreats in spring and summer it leaves behind a surface layer
+that is often freshened, stratified and well lit, and chlorophyll rises in
+the weeks that follow: the ice-edge bloom. This site follows that bloom
+around Antarctica for 29 seasons, by lining up satellite ocean colour with
+the day each place lost its sea ice, and asks what sets its size and timing.
+
+It is part of the trend.* family of open, self-updating Southern Ocean
+records (sea surface temperature, sea level, chlorophyll, and now sea ice).
+
+## What we find
+
+- **The bloom follows retreat.** Over the whole record, median chlorophyll
+  rises from about 0.2 mg m^-3^ a month before retreat to about 0.34 mg m^-3^
+  a month after it (1.5x the pre-retreat mean), then decays back to the
+  pre-retreat level by about four months after retreat.
+- **Retreat timing orders the bloom.** Early (spring) retreats give slow,
+  broad, late-peaking blooms; mid-season retreats the sharpest and largest;
+  late retreats start from an already high level and peak within about two
+  weeks. Against open water at the same latitude, sector and date, the
+  later the retreat the larger and faster the rise (about 1.2x, 1.4x and
+  1.8x the open-water level for early, mid and late retreat).
+- **The continental shelf carries the strongest blooms.** About 5% of the
+  data, but blooms there reach about 5x the open-water level and stay high
+  for two months; late-retreat shelf water (polynyas, coastal leads) is
+  already productive before the ice formally retreats.
+- **Ice-edge contamination is not the explanation.** Removing pixels with
+  ice nearby *raises* the pre-retreat level rather than lowering it.
+- **Physics matters most for spring retreats.** In a reanalysis of the
+  ocean state after retreat, deeper mixing and saltier surface water lower
+  the bloom peak for early retreats (strongest in the Ross and
+  Bellingshausen-Amundsen sectors); for summer retreats, already shallow and
+  well lit, the physical state explains little.
+- **Year-to-year variation at a place is only weakly explained** by
+  timing, mixing, temperature or salinity. An earlier than usual retreat
+  lowers the peak in the Weddell and Ross seas by about 15%. The likely
+  missing driver is iron supply.
+
+See [Maps](maps.qmd) for where, [Results](results.qmd) for the curves
+behind these statements, [Methods](methods.qmd) for how, and
+[Data](data.qmd) for everything needed to reproduce or reuse it.
+
+::: {.callout-note}
+## Status
+First complete pass, November 2026. The analysis code, intermediate
+tables and a running log are in the repository; the numbers here will
+change as the methods are refined (see the caveats on each page).
+:::

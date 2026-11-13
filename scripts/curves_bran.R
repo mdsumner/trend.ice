@@ -79,6 +79,9 @@ post <- tab[tab$clean & tab$dsr >= 0 & tab$dsr <= 60, ]
 pre <- tab[tab$dsr >= -30 & tab$dsr <= -1, ]
 np <- table(post$key); nq <- table(pre$key)
 cy$peak <- tapply(post$log10chl, post$key, max)[cy$key]
+po <- post[order(post$key, -post$log10chl), ]
+po <- po[!duplicated(po$key), ]
+cy$peak_dsr <- po$dsr[match(cy$key, po$key)]
 cy$peak[is.na(np[cy$key]) | np[cy$key] < 3] <- NA
 cy$pre <- tapply(pre$log10chl, pre$key, mean)[cy$key]
 cy$pre[is.na(nq[cy$key]) | nq[cy$key] < 2] <- NA
@@ -154,6 +157,13 @@ day_length <- function(lat, doy) {
 d$lat <- cells$lat[match(d$cell, cells$cell)]
 d$rday <- as.integer(d$rdate - as.Date(sprintf("%04d-02-15", d$ice_year))) + 1L
 d$daylen <- day_length(d$lat, as.integer(format(d$rdate, "%j")))
+## per cell-year table, for maps (scripts/make_maps.R)
+cyout <- d[c("cell", "ice_year", "rday", "timing", "peak", "peak_dsr", "pre", "amp",
+             "mld_at", "temp_at", "salt_at", "mld_post", "temp_post", "salt_post")]
+cyout$timing <- as.character(cyout$timing)
+if (requireNamespace("arrow", quietly = TRUE)) {
+  arrow::write_parquet(cyout, file.path(outdir, "cellyears.parquet"))
+} else utils::write.csv(cyout, gzfile(file.path(outdir, "cellyears.csv.gz")), row.names = FALSE)
 dt <- d[ave(d$peak, d$cell, FUN = length) >= 5, ]
 if (nrow(dt)) {
 for (v in c("peak", "amp", "rday")) {
