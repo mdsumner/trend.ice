@@ -60,3 +60,38 @@ very little of year-to-year bloom variation at a given place. Retreat
 timing and shelf/place explain far more. Caveats: BRAN is a reanalysis with
 few observations under or near the ice; 5-day / 25 km averaging; the bloom
 metric is noisy; light and iron are not in BRAN.
+
+## Retreat timing year to year, and day length
+
+`timing_withincell_correlations.csv`, `timing_withincell_bins.csv`,
+`daylength_correlations.csv`. Retreat day varies by ~12-24 days (sd) from
+year to year at a place (Indian least, Bellingshausen-Amundsen most).
+
+**Peak** (the clean metric): an earlier-than-usual retreat gives a lower
+peak in the Weddell and Ross (15+ days early: -0.07 log10, ~15% lower;
+later than usual: up to +0.04 in the Ross). Indian, W Pacific: flat.
+Bellingshausen-Amundsen: both extremes lower. Overall within-cell rho
++0.01 - a sector-specific effect, not a universal one.
+
+**Amplitude** (peak minus pre-retreat level) falls with later retreat in
+every sector (rho -0.08 to -0.37, all -0.18). Treat with care: the
+pre-retreat window moves with the retreat date, so a late retreat compares
+the peak against a mid-summer (already higher) level and an early retreat
+against a spring (low) level. Much of this is that seasonal shift, not
+biology. A fair amplitude needs the pre-retreat level expressed against
+the seasonal cycle (e.g. the open-water baseline at that latitude and date).
+
+**Day length** at retreat (latitude + date): for early retreats, more light
+at retreat goes with a higher peak (rho +0.11; latitude alone -0.07); for
+mid and late retreats ~0.04.
+
+## Overall picture so far
+
+Spring (early) retreats are light- and mixing-limited: deeper post-retreat
+mixed layers (Ross -0.35, B-A -0.28), shorter days and earlier-than-usual
+retreat (Weddell, Ross) all lower the bloom peak, and fresher surface water
+helps. Summer (mid / late) retreats sit in shallow, stratified water with
+long days; physical state then explains little, and place (shelf, sector)
+and timing class dominate. Year-to-year variation at a place is only
+weakly explained by any of these - the missing driver is probably iron
+supply, which BRAN does not carry.

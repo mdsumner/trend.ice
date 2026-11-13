@@ -8,6 +8,26 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-13 (u) - timing within cell, day length: read
+
+Retreat day varies ~12-24 d (sd) year to year at a place. Peak: earlier
+than usual -> lower in Weddell / Ross (-0.07 log10 for 15+ d early);
+flat elsewhere. Amplitude falls with later retreat everywhere (-0.18) but
+that is largely the moving pre-retreat window (seasonal level), not
+biology. Day length at retreat +0.11 with peak for early retreats.
+Synthesis in `results/curves_bran/README.md`: spring retreats light- and
+mixing-limited; summer retreats physically unconstrained in BRAN terms;
+year-to-year variation weakly explained - iron is the likely missing piece.
+
+Next options:
+
+1. Fix amplitude: express the pre-retreat level against the open-water
+   seasonal baseline (same latitude band, sector, date), then redo timing
+2. Iron proxy: distance to shelf break / ice-shelf front / continent
+3. Write-up (README methods + results, or a hypertidy.org post)
+
+---
+
 ## 2026-11-13 (t) - within-cell retreat timing + day length
 
 Added to `scripts/curves_bran.R` (test now uses 6 synthetic years with
