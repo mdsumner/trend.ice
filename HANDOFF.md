@@ -6,6 +6,21 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (p) - BRAN check looks right; Acacia write probe
+
+`check_bran.R` on 2015: 48 composites (mid 2015-01-03 .. 2015-12-29),
+75,729 cells. mld median 57 m (1%-99%: 7-435 m, max 4213 - deep winter
+convection / ice-shelf-front pixels, use medians), surface temp -1.8 to 10.6
+(max 15.9 at the northern edge), salt 33.4-34.5 (32.1-35.1 extremes).
+December map: fronts, warm north, fresh near-ice water - scale factors
+applied correctly.
+
+Added `gadi/probe_acacia.sh`: write / list / read / delete a tiny file in
+`aad-derived/trend-ice/_probe/` with the pawsey1197 profile, before running
+`gadi/publish.sh`.
+
+---
+
 ## 2026-11-13 (o) - BRAN full run done; join script ready
 
 `gadi/bran.sh` (job 183830457) ran the full range directly (no trial):
