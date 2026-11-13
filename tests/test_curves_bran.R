@@ -5,8 +5,8 @@ ncell <- 3000
 cells <- data.frame(cell = 1:ncell, lon = 0, lat = -65, sector = "Weddell", depth = -4000)
 write.csv(cells, gzfile(file.path(cd, "cells.csv.gz")), row.names = FALSE)
 mld_cell <- runif(ncell, 10, 100)
-for (y in 2001:2002) {
-  ret <- sample(250:330, ncell, TRUE)            # retreat day of ice year
+for (y in 2001:2006) {
+  ret <- pmin(pmax(round(250 + (1:ncell) %% 80 + rnorm(ncell, 0, 10)), 240), 340)  # cell-specific, varies by year
   rows <- do.call(rbind, lapply(seq(-30, 90, by = 5), function(o) {
     data.frame(cell = 1:ncell, dsr = o + sample(0:4, ncell, TRUE))
   }))
@@ -35,5 +35,8 @@ for (tm in unique(s$timing)) {
 }
 stopifnot(all(c$peak_mld < -0.5), all(c$amp_mld < -0.5), all(c$n > 1500))
 stopifnot(file.exists(file.path(od, "bloom_withincell_correlations.csv")),
-          file.exists(file.path(od, "bloom_rank_correlations_by_sector.csv")))
+          file.exists(file.path(od, "bloom_rank_correlations_by_sector.csv")),
+          file.exists(file.path(od, "timing_withincell_correlations.csv")),
+          file.exists(file.path(od, "timing_withincell_bins.csv")),
+          file.exists(file.path(od, "daylength_correlations.csv")))
 cat("curves_bran test pass\n")

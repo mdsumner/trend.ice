@@ -8,6 +8,24 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-13 (t) - within-cell retreat timing + day length
+
+Added to `scripts/curves_bran.R` (test now uses 6 synthetic years with
+cell-specific, year-varying retreat):
+
+- `timing_withincell_correlations.csv`: per sector and all - retreat-day
+  anomaly (vs the cell's own mean) against peak / amplitude anomaly, plus
+  the spread of retreat-day anomalies
+- `timing_withincell_bins.csv`: median peak / amp anomaly for retreats
+  15+ d early, 5-15 d early, usual, 5-15 d late, 15+ d late, by sector
+- `daylength_correlations.csv`: day length at the retreat date (latitude +
+  date) vs peak and latitude vs peak, pooled within timing class
+
+Next (Nectar): pull, rerun curves_bran.R, copy results, push (same commands
+as (r)).
+
+---
+
 ## 2026-11-13 (s) - BRAN controls read
 
 Within sector, the pooled salinity signal goes away (it was between

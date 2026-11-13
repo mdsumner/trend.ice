@@ -128,6 +128,7 @@ bys <- do.call(rbind, lapply(split(d, list(d$timing, d$sector), drop = TRUE), fu
 w(bys[order(bys$timing, bys$sector), ], "bloom_rank_correlations_by_sector")
 nyr <- ave(d$peak, d$cell, FUN = length)
 dw <- d[nyr >= 5, ]
+if (nrow(dw)) {
 for (v in c("peak", "amp", "mld_post", "temp_post", "salt_post")) {
   dw[[paste0(v, "_a")]] <- dw[[v]] - ave(dw[[v]], dw$cell, FUN = function(z) mean(z, na.rm = TRUE))
 }
@@ -139,6 +140,48 @@ wc <- do.call(rbind, lapply(split(dw, dw$timing), function(x)
              amp_salt = rho(x$amp_a, x$salt_post_a))))
 w(wc, "bloom_withincell_correlations")
 message("within-cell (year-to-year at a place):"); print(wc, row.names = FALSE)
+}
+
+## Retreat timing itself, year to year at a place: does an earlier / later
+## than usual retreat at a cell go with a smaller / larger bloom there?
+## Also day length at the retreat date (from latitude and date alone), to
+## separate light from timing in the pooled data.
+day_length <- function(lat, doy) {
+  decl <- 23.44 * pi / 180 * sin(2 * pi * (284 + doy) / 365)
+  x <- -tan(lat * pi / 180) * tan(decl)
+  24 / pi * acos(pmin(pmax(x, -1), 1))
+}
+d$lat <- cells$lat[match(d$cell, cells$cell)]
+d$rday <- as.integer(d$rdate - as.Date(sprintf("%04d-02-15", d$ice_year))) + 1L
+d$daylen <- day_length(d$lat, as.integer(format(d$rdate, "%j")))
+dt <- d[ave(d$peak, d$cell, FUN = length) >= 5, ]
+if (nrow(dt)) {
+for (v in c("peak", "amp", "rday")) {
+  dt[[paste0(v, "_a")]] <- dt[[v]] - ave(dt[[v]], dt$cell, FUN = function(z) mean(z, na.rm = TRUE))
+}
+tw <- do.call(rbind, lapply(split(dt, dt$sector), function(x)
+  data.frame(sector = x$sector[1], n = nrow(x), ncell = length(unique(x$cell)),
+             sd_rday_a = stats::sd(x$rday_a),
+             peak_rday = rho(x$peak_a, x$rday_a), amp_rday = rho(x$amp_a, x$rday_a))))
+tw <- rbind(tw, data.frame(sector = "all", n = nrow(dt), ncell = length(unique(dt$cell)),
+                           sd_rday_a = stats::sd(dt$rday_a),
+                           peak_rday = rho(dt$peak_a, dt$rday_a), amp_rday = rho(dt$amp_a, dt$rday_a)))
+w(tw, "timing_withincell_correlations")
+dt$shift <- cut(dt$rday_a, c(-Inf, -15, -5, 5, 15, Inf),
+                labels = c("15+ d early", "5-15 d early", "usual", "5-15 d late", "15+ d late"))
+tb <- do.call(rbind, lapply(split(dt, list(dt$sector, dt$shift), drop = TRUE), function(x)
+  data.frame(sector = x$sector[1], shift = x$shift[1], n = nrow(x),
+             peak_anom_med = stats::median(x$peak_a), amp_anom_med = stats::median(x$amp_a, na.rm = TRUE))))
+tb <- tb[order(tb$sector, tb$shift), ]
+w(tb, "timing_withincell_bins")
+message("retreat timing, year to year at a place:"); print(tw, row.names = FALSE)
+print(tb[tb$sector == tb$sector[1], ], row.names = FALSE)
+} else message("no cells with >= 5 years: skipping within-cell timing")
+dl <- do.call(rbind, lapply(split(d, d$timing), function(x)
+  data.frame(timing = x$timing[1], n = nrow(x), daylen_med = stats::median(x$daylen),
+             peak_daylen = rho(x$peak, x$daylen), peak_lat = rho(x$peak, x$lat))))
+w(dl, "daylength_correlations")
+message("day length at retreat (pooled, within timing class):"); print(dl, row.names = FALSE)
 
 ## curves by timing x MLD tercile (clean rows)
 tab$mld_t <- d$mld_t[match(tab$key, d$key)]
