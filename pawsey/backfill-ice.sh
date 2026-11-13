@@ -6,7 +6,9 @@
 #SBATCH --time=08:00:00
 #SBATCH --output=%x-%j.out
 ## refresh the catalog, backfill missing (and changed-source) dates,
-## publish sums, mapping, catalog and manifest to the bucket.
+## publish sums, mapping, catalog and manifest to the bucket. Workers come
+## from WORKERS (pawsey/config.sh, default 12), not the CPU count: the
+## first run at 54 workers on 96 GB was OOM-killed.
 ##   sbatch pawsey/backfill-ice.sh     # from the repo root, AFTER the oracle passed
 ## Resumable: rerun after any interruption and only the remaining dates
 ## are done. ~17,500 small reads (316 x 332 each) through the index.
@@ -23,7 +25,7 @@ reg <- read_parquet("s2_registry.parquet")
 files <- read_parquet("icefiles.parquet")
 src <- stat_source(Sys.getenv("SRC"), files, transform = Sys.getenv("TRANSFORM"),
                    grid = list(projection = Sys.getenv("CRS")))
-backfill(src, reg, workers = as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "24")))
+backfill(src, reg, workers = as.integer(Sys.getenv("WORKERS", "12")))
 R
 module load rclone/1.68.1
 rclone copy --checksum sums/ $BUCKET/sums/ || echo "WARNING: sums copy FAILED" >&2

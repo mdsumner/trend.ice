@@ -31,4 +31,9 @@ GRIST_REF=${GRIST_REF:-hypertidy/grist@mdim-projected}
 export GDAL_CACHEMAX=256
 export GDAL_PAM_ENABLED=NO
 export GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR
-export SRC TRANSFORM CRS WORK REPO
+export GDAL_LOAD_EXTRA_DIM_METADATA_DELAY=0
+## parallel workers for the backfill, independent of the CPUs allocated:
+## each worker holds R + arrow + GDAL + the parsed index; set from
+## pawsey/memprobe.sh (workers ~ 0.8 * job memory / per-worker MB)
+WORKERS=${WORKERS:-12}
+export SRC TRANSFORM CRS WORK REPO WORKERS
