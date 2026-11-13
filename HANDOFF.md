@@ -8,6 +8,25 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-14 (b) - S2 trend slots filled (sst, chl, sla)
+
+trend.sst, trend.chl and trend.sla are already deployed on Setonix (scrontab,
+sums on Acacia, Pages exports). `scripts/s2_trend_maps.R` draws their
+per-cell trends south of 40S from the committed `docs/data/cells-*.json`
+(sibling clones if present, else the Pages URLs) into
+`site/figures/s2_trend_{sst,chl,sla}.png`. Run from the repo root:
+
+    Rscript scripts/s2_trend_maps.R
+
+Caveat on the site: the chl ring in the seasonal ice zone is likely a
+sampling artefact of annual means (which months are visible has changed).
+
+Next: trend.ice as a grist deployment (sea ice concentration sums on S2
+cells, daily) to fill `s2_trend_ice.png` - needs a catalog of the daily
+ice fields readable from Setonix (CDR on Acacia, or the existing ASI index).
+
+---
+
 ## 2026-11-14 (a) - site live with real maps
 
 Pages enabled; site at https://mdsumner.github.io/trend.ice/ built from

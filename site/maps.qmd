@@ -55,22 +55,34 @@ A one-cell seam along 180 degrees longitude (bottom centre) is an artefact of
 regridding the chlorophyll at the antimeridian, to be fixed.
 :::
 
-## Trends on S2 cells (coming)
+## Trends on S2 cells
 
 The trend.* records compute sufficient statistics on a discrete global grid
-(S2 cells), which gives exact, updatable trends from daily data without
-storing the daily fields. These panels are reserved for those trends in
-the same view as the seasonality and bloom maps above.
+(S2 level-5 cells, about 290 km), which gives exact, updatable trends from
+daily or 5-day data without storing the fields. Each record runs on a
+schedule on Setonix and publishes its sums to Acacia; the panels below are
+drawn from each record's published cell export (trend of annual means, by
+least squares) in the same south polar view as the maps above.
 
 ::: {layout-ncol=2}
-![Sea surface temperature](figures/s2_trend_sst.png)
+![Sea surface temperature ([trend.sst](https://github.com/mdsumner/trend.sst))](figures/s2_trend_sst.png)
 
-![Chlorophyll](figures/s2_trend_chl.png)
+![Chlorophyll-a ([trend.chl](https://github.com/mdsumner/trend.chl))](figures/s2_trend_chl.png)
 
-![Sea level anomaly](figures/s2_trend_sla.png)
+![Sea level anomaly ([trend.sla](https://github.com/mdsumner/trend.sla))](figures/s2_trend_sla.png)
 
-![Sea ice](figures/s2_trend_ice.png)
+![Sea ice (to come)](figures/s2_trend_ice.png)
 :::
 
-Each panel is a fixed file name (`site/figures/s2_trend_<var>.png`); writing
-the real map to that name replaces the placeholder.
+Read with care in the seasonal ice zone. SST there is held near freezing
+under ice, so the slight cooling ring is mostly the open-water months. The
+strong positive chlorophyll ring is not yet a result: an annual mean of
+ocean colour only sees the months with light and open water, and which
+months those are has itself changed with the ice. A like-for-like trend
+needs the sums restricted to a fixed season (or weighted by days since
+retreat, as in the bloom analysis above); the sums support that without
+recomputation.
+
+Drawn by `scripts/s2_trend_maps.R`, which reads the `docs/data/cells-*.json`
+exports of each record; the sea ice panel waits for a sea ice record on
+the same engine.
