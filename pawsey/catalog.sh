@@ -20,6 +20,17 @@ elif $RUN ogr2ogr -f Parquet -lco COMPRESSION=SNAPPY icefiles.parquet icefiles-s
   echo "re-encoded with GDAL (ogr2ogr)"
 fi
 [ -s icefiles.parquet ] || { echo "could not re-encode the catalog (no pyarrow, no GDAL Parquet with zstd)" >&2; exit 1; }
+## with a mirror, every row reads through the remapped index instead
+if [ -n "$MIRROR_TO" ]; then
+  [ -s mdim-mirror.vrt ] || bash "$REPO/pawsey/remap_index.sh"
+  $RUN python3 -c "
+import pyarrow.parquet as pq, pyarrow as pa
+t = pq.read_table('icefiles.parquet')
+t = t.set_column(t.schema.get_field_index('dsn'), 'dsn', pa.array(['$WORK/mdim-mirror.vrt'] * t.num_rows))
+pq.write_table(t, 'icefiles.parquet', compression='snappy')
+print('catalog dsn ->', '$WORK/mdim-mirror.vrt')
+"
+fi
 $RUN Rscript - <<'R'
 f <- arrow::read_parquet("icefiles.parquet")
 d <- as.Date(f$date)

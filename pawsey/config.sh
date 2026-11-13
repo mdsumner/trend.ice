@@ -13,6 +13,14 @@ TRANSFORM=${TRANSFORM:-unit_interval}    # drops CDR flags (2.51..2.55)
 ## here: NSIDC Sea Ice Polar Stereographic South (as the ice season COGs)
 CRS=${CRS:-EPSG:3412}
 CATALOG_URL=${CATALOG_URL:-https://data.source.coop/ausantarctic/ausantarctic-scratch/seaice/g02202-v6-daily-south/grist/catalog.parquet}
+INDEX_URL=${INDEX_URL:-https://data.source.coop/ausantarctic/ausantarctic-scratch/seaice/g02202-v6-daily-south/mdim.vrt}
+## optional mirror of the source files (a scratch copy on Acacia, path =
+## the source URL's host and path, as raad keeps them). When MIRROR_TO is
+## set, pawsey/remap_index.sh writes WORK/mdim-mirror.vrt and the catalog
+## reads through it. Empty = read from NSIDC through the published index.
+MIRROR_FROM=${MIRROR_FROM:-/vsicurl/https://noaadata.apps.nsidc.org/}
+MIRROR_TO=${MIRROR_TO:-}
+## e.g. MIRROR_TO=/vsicurl/https://projects.pawsey.org.au/aad-derived/raad-scratch/noaadata.apps.nsidc.org/
 BUCKET=${BUCKET:-pawsey1197:aad-derived/trend-ice/s2}   # sums published here
 REGISTRY_URL=${REGISTRY_URL:-https://projects.pawsey.org.au/aad-derived/trend-sst/s2_registry.parquet}
 
@@ -38,4 +46,4 @@ export GDAL_LOAD_EXTRA_DIM_METADATA_DELAY=0
 WORKERS=${WORKERS:-12}
 ## dates per chunk; workers are fresh processes per chunk (bounds a leak)
 CHUNK=${CHUNK:-1000}
-export SRC TRANSFORM CRS WORK REPO WORKERS CHUNK
+export SRC TRANSFORM CRS WORK REPO WORKERS CHUNK MIRROR_TO
