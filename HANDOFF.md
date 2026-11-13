@@ -6,6 +6,21 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (n) - BRAN remap to /g/data: clean
+
+`gadi/remap_bran.sh` (job 183806081) into /g/data/jk72/mds581/bluelink-gdata/:
+
+- mld: 5 ref files, 0 unmatched; checked 20 refs in 20 files, 0 problems
+- temp: 380 ref files, 0 unmatched; checked 1960 refs in 273 files, 0 problems
+- salt: 380 ref files, 0 unmatched; checked 1960 refs in 273 files, 0 problems
+
+The published ausantarctic BRAN stores remap cleanly to in-situ Gadi paths -
+worth a note in raad.virtualize.
+
+Next: one-year trial of `gadi/bran.sh` (2015), then the full range.
+
+---
+
 ## 2026-11-13 (m) - planned: VM on the Pawsey Nectar node
 
 Plan: a VM in Nectar's Pawsey zone, close to Setonix (Slurm) and Acacia,
