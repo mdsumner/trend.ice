@@ -6,6 +6,21 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (m) - planned: VM on the Pawsey Nectar node
+
+Plan: a VM in Nectar's Pawsey zone, close to Setonix (Slurm) and Acacia,
+at the cost of slower access to the Tasmanian raad NFS. For trend.ice:
+
+- keep machine-specific bits in thin wrappers (`gadi/` for PBS; a `pawsey/`
+  set for Slurm when the VM exists); everything else reads and writes Acacia
+- the one remaining raad NFS dependency is the daily ice input
+  (`raadtools::readice()` in `R/ice_season.R` and `R/context.R`); putting the
+  CDR daily fields on Acacia (COGs or a refs store) would make the whole
+  pipeline Acacia-only
+- BRAN stays on Gadi in situ (gb6), publishing results to Acacia
+
+---
+
 ## 2026-11-13 (l) - Acacia is home
 
 Decision: Acacia (`s3://aad-derived/trend-ice/`) is the home for everything
