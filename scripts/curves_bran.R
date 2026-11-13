@@ -105,7 +105,7 @@ summ <- do.call(rbind, lapply(split(d, list(d$timing, d$mld_t), drop = TRUE), fu
              peak_med = median(x$peak), n_amp = sum(!is.na(x$amp)), amp_med = median(x$amp, na.rm = TRUE))))
 summ <- summ[order(summ$timing, summ$mld_t), ]
 w(summ, "bloom_by_timing_mld")
-rho <- function(a, b) suppressWarnings(cor(a, b, method = "spearman", use = "complete.obs"))
+rho <- function(a, b) tryCatch(suppressWarnings(cor(a, b, method = "spearman", use = "complete.obs")), error = function(e) NA_real_)
 cors <- do.call(rbind, lapply(split(d, d$timing), function(x)
   data.frame(timing = x$timing[1], n = nrow(x),
              peak_mld = rho(x$peak, x$mld_post), peak_temp = rho(x$peak, x$temp_post),
@@ -114,6 +114,31 @@ cors <- do.call(rbind, lapply(split(d, d$timing), function(x)
              amp_temp = rho(x$amp, x$temp_post), amp_salt = rho(x$amp, x$salt_post))))
 w(cors, "bloom_rank_correlations")
 print(summ, row.names = FALSE); print(cors, row.names = FALSE)
+
+## Pooled correlations mix place with process. Two controls:
+## (1) by sector; (2) within cell: each cell-year minus that cell's mean over
+## years (cells with >= 5 years), so only year-to-year variation at a place
+## counts - does a shallower / fresher / warmer than usual post-retreat
+## state go with a bigger than usual bloom there?
+d$sector <- cells$sector[match(d$cell, cells$cell)]
+bys <- do.call(rbind, lapply(split(d, list(d$timing, d$sector), drop = TRUE), function(x)
+  data.frame(timing = x$timing[1], sector = x$sector[1], n = nrow(x),
+             peak_mld = rho(x$peak, x$mld_post), peak_temp = rho(x$peak, x$temp_post),
+             peak_salt = rho(x$peak, x$salt_post))))
+w(bys[order(bys$timing, bys$sector), ], "bloom_rank_correlations_by_sector")
+nyr <- ave(d$peak, d$cell, FUN = length)
+dw <- d[nyr >= 5, ]
+for (v in c("peak", "amp", "mld_post", "temp_post", "salt_post")) {
+  dw[[paste0(v, "_a")]] <- dw[[v]] - ave(dw[[v]], dw$cell, FUN = function(z) mean(z, na.rm = TRUE))
+}
+wc <- do.call(rbind, lapply(split(dw, dw$timing), function(x)
+  data.frame(timing = x$timing[1], n = nrow(x), ncell = length(unique(x$cell)),
+             peak_mld = rho(x$peak_a, x$mld_post_a), peak_temp = rho(x$peak_a, x$temp_post_a),
+             peak_salt = rho(x$peak_a, x$salt_post_a),
+             amp_mld = rho(x$amp_a, x$mld_post_a), amp_temp = rho(x$amp_a, x$temp_post_a),
+             amp_salt = rho(x$amp_a, x$salt_post_a))))
+w(wc, "bloom_withincell_correlations")
+message("within-cell (year-to-year at a place):"); print(wc, row.names = FALSE)
 
 ## curves by timing x MLD tercile (clean rows)
 tab$mld_t <- d$mld_t[match(tab$key, d$key)]

@@ -24,7 +24,7 @@ for (y in 2001:2002) {
     write.csv(br, gzfile(file.path(bd, sprintf("bran_icegrid_%d.csv.gz", cy))), row.names = FALSE)
   }
 }
-system2("Rscript", c("scripts/curves_bran.R", cd, bd, od))
+out <- system2("Rscript", c("scripts/curves_bran.R", cd, bd, od), stdout = TRUE, stderr = TRUE); cat(tail(out, 12), sep = "\n")
 s <- read.csv(file.path(od, "bloom_by_timing_mld.csv"))
 c <- read.csv(file.path(od, "bloom_rank_correlations.csv"))
 print(s); print(c)
@@ -34,4 +34,6 @@ for (tm in unique(s$timing)) {
   stopifnot(a$amp_med[1] > a$amp_med[2], a$amp_med[2] > a$amp_med[3])
 }
 stopifnot(all(c$peak_mld < -0.5), all(c$amp_mld < -0.5), all(c$n > 1500))
+stopifnot(file.exists(file.path(od, "bloom_withincell_correlations.csv")),
+          file.exists(file.path(od, "bloom_rank_correlations_by_sector.csv")))
 cat("curves_bran test pass\n")

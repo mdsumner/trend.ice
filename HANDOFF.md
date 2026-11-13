@@ -8,6 +8,28 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-13 (r) - BRAN curves v2
+
+Rerun on Nectar after the 2026 BRAN year: 694,737 cell-years (was 1,083);
+2025 now 99% matched. Summary in `results/curves_bran/README.md`: MLD after
+retreat explains little pooled (only early retreat shows a deep-mixing
+penalty, ~0.1 log10); the strongest pooled signal is salinity (+0.12 to
++0.18: saltier -> higher chl), probably place not process.
+
+Added to `curves_bran.R`: correlations by sector and within cell (anomalies
+from each cell's own mean over years; cells with >= 5 years). The stale
+`amplitude_*` files (old outputs still in the local results dir) removed
+again from the repo.
+
+Next (Nectar):
+
+    cd ~/Git/trend.ice && git pull
+    rm -f ~/trend-ice-curves-bran/amplitude_*
+    Rscript scripts/curves_bran.R ~/trend-ice-chl-v2 ~/bran_icegrid ~/trend-ice-curves-bran
+    cp ~/trend-ice-curves-bran/* results/curves_bran/ && git add -A results/curves_bran && git commit -m "BRAN within-cell" && git push
+
+---
+
 ## 2026-11-13 (q) - first BRAN join: sample artefact; reworked
 
 First `curves_bran.R` run (Nectar): join fine (97-100% of chl rows matched
