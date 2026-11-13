@@ -9,10 +9,13 @@
 ##
 ## Sources are read from sibling clones if present (../trend.sst etc.),
 ## otherwise from the Pages sites. Override with environment variables
-## TREND_SST, TREND_CHL, TREND_SLA (path or URL to the cells JSON).
+## TREND_SST, TREND_CHL, TREND_SLA (path or URL to the cells JSON). The
+## sea ice panel is this repo's own export (pawsey/export_ice.R ->
+## site/data/cells-cdr-sic.json, or TREND_ICE); while that file does not
+## exist the panel keeps its placeholder.
 ##
 ## Writes fixed file names (the site refers to them by name):
-##   s2_trend_sst.png, s2_trend_chl.png, s2_trend_sla.png
+##   s2_trend_sst.png, s2_trend_chl.png, s2_trend_sla.png, s2_trend_ice.png
 
 suppressPackageStartupMessages({ library(jsonlite); library(sf) })
 
@@ -39,7 +42,11 @@ src <- list(
   sla = list(file = pick("TREND_SLA", "../trend.sla/docs/data/cells-sla-cmems.json",
                          file.path(pages, "trend.sla/data/cells-sla-cmems.json")),
              title = "Sea level anomaly trend (CMEMS)", units = "mm / yr",
-             zlim = c(-8, 8), mult = 1))
+             zlim = c(-8, 8), mult = 1),
+  ice = list(file = pick("TREND_ICE", "site/data/cells-cdr-sic.json", ""),
+             title = "Sea ice concentration trend (NSIDC CDR v6)",
+             units = "% conc. / decade\n(+ = more ice)",
+             zlim = c(-10, 10), mult = 1))
 coast_file <- pick("TREND_COAST", "../trend.sst/docs/data/coast-110m.json",
                    file.path(pages, "trend.sst/data/coast-110m.json"))
 
@@ -107,4 +114,8 @@ draw <- function(key) {
                   key, sum(!is.na(tr)), -north, min(tr, na.rm = TRUE), max(tr, na.rm = TRUE), f))
 }
 
-for (k in names(src)) draw(k)
+for (k in names(src)) {
+  if (!nzchar(src[[k]]$file)) { message(k, ": no export yet, slot left as is"); next }
+  r <- try(draw(k), silent = TRUE)
+  if (inherits(r, "try-error")) message(k, ": FAILED, slot left as is: ", conditionMessage(attr(r, "condition")))
+}

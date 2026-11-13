@@ -1,0 +1,35 @@
+#!/bin/bash --login
+#SBATCH --job-name=ice-backfill
+#SBATCH --account=pawsey1362
+#SBATCH --partition=work
+#SBATCH --nodes=1 --ntasks=1 --cpus-per-task=24 --mem=96G
+#SBATCH --time=08:00:00
+#SBATCH --output=%x-%j.out
+## refresh the catalog, backfill missing (and changed-source) dates,
+## publish sums, mapping, catalog and manifest to the bucket.
+##   sbatch pawsey/backfill-ice.sh     # from the repo root, AFTER the oracle passed
+## Resumable: rerun after any interruption and only the remaining dates
+## are done. ~17,500 small reads (316 x 332 each) through the index.
+set -eu
+cd "${SLURM_SUBMIT_DIR:-$PWD}"
+bash pawsey/catalog.sh
+source pawsey/config.sh
+cd "$WORK"
+[ -f "mapping/$SRC/meta.rds" ] || { echo "no mapping: run pawsey/onboard-ice.sh first" >&2; exit 1; }
+$RUN Rscript - <<'R'
+library(arrow)      # FIRST, before anything loads GDAL
+library(grist)
+reg <- read_parquet("s2_registry.parquet")
+files <- read_parquet("icefiles.parquet")
+src <- stat_source(Sys.getenv("SRC"), files, transform = Sys.getenv("TRANSFORM"))
+backfill(src, reg, workers = as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "24")))
+R
+module load rclone/1.68.1
+rclone copy --checksum sums/ $BUCKET/sums/ || echo "WARNING: sums copy FAILED" >&2
+rclone copy --checksum mapping/ $BUCKET/mapping/ || echo "WARNING: mapping copy FAILED" >&2
+for f in s2_registry.parquet icefiles.parquet; do
+  rclone copyto --checksum $f $BUCKET/$f || echo "WARNING: $f copy FAILED" >&2
+done
+$RUN Rscript -e 'grist::write_manifest(".")' \
+  && rclone copyto manifest.json $BUCKET/manifest.json \
+  || echo "WARNING: manifest FAILED" >&2

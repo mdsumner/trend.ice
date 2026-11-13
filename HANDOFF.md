@@ -8,6 +8,30 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-14 (c) - sea ice on S2 cells: grist branch + pawsey/ deployment
+
+Source: the indexed CDR (G02202 v6 daily south) on source.coop
+ausantarctic, whose grist catalog (mdim shape) is published beside the
+index. The amsr2 COGs on Acacia (idea-amsr2-asi-s3125) are an abandoned
+scheme and are not used.
+
+grist needed two things, now on branch `hypertidy/grist@mdim-projected`
+(1237e74, main untouched): the mdim catalog read path (gdalraster
+mdim_info / mdim_as_classic) and projected grids (pixel area weights in
+km2). Tests pass for the parts that need no multidim read; the real read
+is checked by the oracle. The branch goes into its own R library for
+trend.ice only.
+
+To run on Setonix (see pawsey/README.md):
+
+    cd /scratch/pawsey1362/mdsumner/trend.ice     # clone it there first
+    bash pawsey/check_container.sh                 # paste output back
+    sbatch pawsey/onboard-ice.sh                   # then paste GRIST/NUMPY lines + look at the png
+
+Do not start the backfill until the oracle has been read.
+
+---
+
 ## 2026-11-14 (b) - S2 trend slots filled (sst, chl, sla)
 
 trend.sst, trend.chl and trend.sla are already deployed on Setonix (scrontab,
