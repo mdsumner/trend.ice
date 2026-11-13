@@ -6,6 +6,20 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (j) - remap fix: no pyarrow S3 needed
+
+First `remap_bran.sh` run failed for all three: the image's pyarrow is built
+without S3FileSystem. `kerchunk_remap.py` now lists source.coop with the S3
+ListObjectsV2 XML API and downloads over plain https (stdlib only), with
+retries for dropped connections. Tried from the cloud workspace: mld remap
+OK (paths -> /g/data/gb6/BRAN/BRAN2020/daily/...), full temp scan OK (all
+refs under thredds .../fileServer/gb6/, one retried file).
+
+Next (Gadi): `git pull && qsub gadi/remap_bran.sh` (output dir is empty, so
+nothing to clean up).
+
+---
+
 ## 2026-11-13 (i) - BRAN stores: remap straight from source.coop
 
 Container refreshed on Gadi; `gadi/check_env.sh`: everything present

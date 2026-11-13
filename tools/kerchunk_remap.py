@@ -26,26 +26,63 @@ from collections import Counter
 
 import pyarrow as pa
 import pyarrow.compute as pc
-import pyarrow.fs as pafs
 import pyarrow.parquet as pq
 
 SOURCECOOP = "https://data.source.coop/"
 
 
-def source_fs(src):
-    """(filesystem, root) for a local path or a source.coop URL"""
-    if src.startswith(SOURCECOOP):
-        fs = pafs.S3FileSystem(anonymous=True, endpoint_override="https://data.source.coop")
-        return fs, src[len(SOURCECOOP):].strip("/")
-    return pafs.LocalFileSystem(), os.path.abspath(src)
+def _sourcecoop_list(path):
+    """keys under account/prefix via the S3 ListObjectsV2 XML API (stdlib only;
+    some pyarrow builds lack S3 support)"""
+    import urllib.parse
+    import urllib.request
+    import xml.etree.ElementTree as ET
+    account, _, prefix = path.partition("/")
+    prefix = prefix.rstrip("/") + "/"
+    ns = {"s": "http://s3.amazonaws.com/doc/2006-03-01/"}
+    keys, token = [], None
+    while True:
+        q = {"list-type": "2", "prefix": prefix}
+        if token:
+            q["continuation-token"] = token
+        url = f"{SOURCECOOP}{account}?{urllib.parse.urlencode(q)}"
+        with urllib.request.urlopen(url) as r:
+            root = ET.fromstring(r.read())
+        keys += [c.find("s:Key", ns).text for c in root.findall("s:Contents", ns)]
+        if root.findtext("s:IsTruncated", namespaces=ns) != "true":
+            break
+        token = root.findtext("s:NextContinuationToken", namespaces=ns)
+    return [k[len(prefix):] for k in keys]
 
 
 def list_files(src):
-    """(filesystem, root, [relative paths]) of all files under src"""
-    fs, root = source_fs(src)
-    info = fs.get_file_info(pafs.FileSelector(root, recursive=True))
-    rel = [i.path[len(root):].lstrip("/") for i in info if i.type == pafs.FileType.File]
-    return fs, root, rel
+    """(get, [relative paths]): get(rel) returns the file's bytes"""
+    if src.startswith(SOURCECOOP):
+        import urllib.request
+        path = src[len(SOURCECOOP):].strip("/")
+        rel = _sourcecoop_list(path)
+
+        def get(r, tries=5):
+            import time
+            for i in range(tries):
+                try:
+                    with urllib.request.urlopen(f"{SOURCECOOP}{path}/{r}", timeout=120) as f:
+                        return f.read()
+                except Exception as e:  # dropped connections on large files
+                    if i == tries - 1:
+                        raise
+                    print(f"  retry {r}: {e.__class__.__name__}", file=sys.stderr)
+                    time.sleep(2 * (i + 1))
+        return get, rel
+    root = os.path.abspath(src)
+    rel = []
+    for d, _, fs in os.walk(root):
+        rel += [os.path.relpath(os.path.join(d, f), root) for f in fs]
+
+    def get(r):
+        with open(os.path.join(root, r), "rb") as f:
+            return f.read()
+    return get, rel
 
 
 def is_refs(rel):
@@ -72,13 +109,12 @@ def prefix_of(p, depth=6):
 
 
 def scan(src, n=20):
-    fs, root, rel = list_files(src)
+    get, rel = list_files(src)
     c = Counter()
     for r in rel:
         if not is_refs(r):
             continue
-        with fs.open_input_file(f"{root}/{r}") as f:
-            t = pq.read_table(f, columns=["path"])
+        t = pq.read_table(pa.BufferReader(get(r)), columns=["path"])
         for p in pc.unique(t["path"]).to_pylist():
             if p is not None:
                 c[prefix_of(p)] += 1
@@ -107,21 +143,20 @@ def remap_table(t, rules):
 def remap(src, dst, rules):
     if os.path.exists(dst):
         sys.exit(f"{dst} exists; refusing to overwrite")
-    fs, root, rel = list_files(src)
+    get, rel = list_files(src)
     nfile = nunm = 0
     for r in rel:
         out = os.path.join(dst, r)
         os.makedirs(os.path.dirname(out), exist_ok=True)
         if is_refs(r):
-            with fs.open_input_file(f"{root}/{r}") as f:
-                t = pq.read_table(f)
+            t = pq.read_table(pa.BufferReader(get(r)))
             t2, unm = remap_table(t, rules)
             pq.write_table(t2, out, compression="zstd")
             nfile += 1
             nunm += unm
         else:
-            with fs.open_input_stream(f"{root}/{r}") as f, open(out, "wb") as g:
-                g.write(f.read())
+            with open(out, "wb") as g:
+                g.write(get(r))
     print(f"remapped {nfile} ref files; {nunm} paths matched no rule (left as is)")
     return nunm
 
