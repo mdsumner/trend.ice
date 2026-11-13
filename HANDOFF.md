@@ -6,6 +6,38 @@ what is next, anything blocking. Keep entries short; detail goes in commits.
 
 ---
 
+## 2026-11-13 (o) - BRAN full run done; join script ready
+
+`gadi/bran.sh` (job 183830457) ran the full range directly (no trial):
+55 min walltime, 48 GB of 64 used. bran5day: 1997-2025, ~420 MB NetCDF per
+year; bran_icegrid: ~72 MB parquet per year, 3,634,992 rows per year
+(3,710,721 in 2024: one extra composite), i.e. ~75.7k cells x 48 Sep-Apr
+composites.
+
+Added:
+
+- `scripts/check_bran.R`: value ranges + a Dec map of one year's table
+  (sanity check, since there was no trial run)
+- `scripts/curves_bran.R` (tested with a planted MLD effect,
+  `tests/test_curves_bran.R`): joins chl (context run, clean, off-shelf)
+  with BRAN on (cell, mid); state at retreat = mean mld/temp/salt over
+  dsr -5..5; bloom amplitude = max log10 chl dsr 0..60 minus mean dsr
+  -30..-1; MLD terciles within each retreat-timing tercile; amplitude
+  table, Spearman correlations, curves by timing x MLD tercile.
+
+Next:
+
+1. Gadi: `Rscript scripts/check_bran.R` inside the container
+   (`source gadi/env.sh; $RUN Rscript scripts/check_bran.R`) - expect mld
+   ~5-500 m, temp ~-1.9-15, salt ~33-35; look at the png.
+2. Gadi: `qsub gadi/publish.sh` (bran5day, bran_icegrid -> Acacia).
+3. Nectar: `scripts/publish_acacia.sh ~/trend-ice-chl-v2 chl_dsr_v2`.
+4. Nectar: cache bran_icegrid from Acacia, then
+   `Rscript scripts/curves_bran.R ~/trend-ice-chl-v2 ~/bran_icegrid ~/trend-ice-curves-bran`
+   and push the results to `results/curves_bran/`.
+
+---
+
 ## 2026-11-13 (n) - BRAN remap to /g/data: clean
 
 `gadi/remap_bran.sh` (job 183806081) into /g/data/jk72/mds581/bluelink-gdata/:
