@@ -35,3 +35,28 @@ correlations by sector and **within cell** (each cell-year minus that
 cell's mean over years: does a shallower / fresher / warmer than usual
 state at a place go with a bigger than usual bloom there?). Those are the
 numbers to read next.
+
+## Controls: by sector and within cell
+
+**Within sector** (`bloom_rank_correlations_by_sector.csv`) the pooled
+salinity signal goes away (mostly -0.07..+0.08); it was a between-sector
+contrast. What remains is for **early** retreat: deeper mixing goes with a
+lower peak, strongest in the Ross (-0.35) and Bellingshausen-Amundsen
+(-0.28) sectors, weaker in Weddell / W Pacific (-0.16, -0.17), ~0 in the
+Indian sector; and fresher water goes with a higher peak there (salt -0.13
+to -0.19 in Weddell, Ross, B-A). That is the meltwater-stratification
+picture, but only for spring retreats, when mixed layers are still deep.
+Mid and late retreats: all |rho| < 0.16.
+
+**Within cell** (`bloom_withincell_correlations.csv`, year-to-year at a
+place, ~20-25k cells each): everything is weak, |rho| <= 0.11. Largest:
+amplitude vs post-retreat temperature -0.06 to -0.11 (warmer than usual,
+smaller rise), amplitude vs MLD +0.06 to +0.11, late-retreat peak vs
+temperature +0.09.
+
+Reading: BRAN's post-retreat state explains spatial differences for early
+retreats (where in a sector the water mixes deeply and stays salty) but
+very little of year-to-year bloom variation at a given place. Retreat
+timing and shelf/place explain far more. Caveats: BRAN is a reanalysis with
+few observations under or near the ice; 5-day / 25 km averaging; the bloom
+metric is noisy; light and iron are not in BRAN.

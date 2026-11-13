@@ -8,6 +8,29 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-13 (s) - BRAN controls read
+
+Within sector, the pooled salinity signal goes away (it was between
+sectors). Early retreats keep a deep-mixing penalty (Ross -0.35, B-A -0.28,
+Weddell / W Pacific ~-0.16) and a fresher-is-better signal (salt -0.13 to
+-0.19 in Weddell, Ross, B-A) - meltwater stratification, but only for spring
+retreats. Within cell (year-to-year at a place) everything is weak
+(|rho| <= 0.11). Write-up in `results/curves_bran/README.md`.
+
+Candidate next steps (not started):
+
+1. Within-cell test of the main driver: does an earlier / later than usual
+   retreat at a place give a smaller / larger bloom there? (retreat-day
+   anomaly vs peak / amp anomaly, by sector)
+2. Separate light from timing: noon sun elevation or day length at the
+   retreat date (deterministic from latitude + date) as a covariate
+3. Place: distance to shelf break / ice shelf front (iron proxy) from
+   GEBCO + coastline
+4. Write-up: a short methods + results note (trend.ice README or a
+   hypertidy.org post)
+
+---
+
 ## 2026-11-13 (r) - BRAN curves v2
 
 Rerun on Nectar after the 2026 BRAN year: 694,737 cell-years (was 1,083);
