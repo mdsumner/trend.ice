@@ -8,6 +8,28 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-14 (d) - sea ice S2 record complete; all four slots filled
+
+- CDR south mirrored to Acacia as scratch
+  (`aad-derived/raad-scratch/noaadata.apps.nsidc.org/NOAA/G02202_V6/south/`;
+  north too; Bremen ASI netCDF syncing from their server). The published
+  index is remapped to it (`pawsey/remap_index.sh`, `MIRROR_TO` in
+  config.sh); the oracle reproduces the NSIDC-read numbers exactly.
+- Backfill from the mirror: ~1 min per 1000 dates (vs ~1 h against NSIDC,
+  which also produced worker free() crashes - none from the mirror).
+  17464 of 17531 dates; 67 missing, most likely the 1987-12-03..1988-01-13
+  SSM/I gap - to confirm.
+- verify.sh: 40 of 40 random dates identical to a single-process recompute.
+- Export: 613 cells with a 1979-2025 trend; map shows the Bellingshausen /
+  Amundsen loss and Ross gain, matching the retreat-trend map.
+- grist: branch `mdim-projected` (mdim catalogs, projected grids, partial
+  grid override, slim workers); classic path checked zero-diff against
+  trend.chl. PR to merge; then GRIST_REF -> hypertidy/grist.
+- Index lacks the CRS (grid mapping) - comment drafted for raad.virtualize;
+  `CRS=EPSG:3412` in config.sh until fixed there.
+
+---
+
 ## 2026-11-14 (c) - sea ice on S2 cells: grist branch + pawsey/ deployment
 
 Source: the indexed CDR (G02202 v6 daily south) on source.coop
