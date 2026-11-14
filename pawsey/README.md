@@ -19,8 +19,8 @@ Same product as the ice season COGs (`R/ice_season.R`), so the S2 trends
 and the retreat / duration maps come from one record.
 
 The catalog uses grist's mdim shape (`date, dsn, array, index`) and the
-grid is projected, both new in grist branch `mdim-projected`. That branch
-is installed into its own R library (`$MYSOFTWARE/r-lib-trend-ice`, first
+grid is projected, both in grist since 0.0.2 (merged from the
+`mdim-projected` branch). grist is installed into its own R library (`$MYSOFTWARE/r-lib-trend-ice`, first
 on the path for these scripts only), so the other three deployments keep
 the grist they were validated with.
 

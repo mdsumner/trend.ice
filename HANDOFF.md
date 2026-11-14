@@ -8,6 +8,25 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-14 (e) - grist follows main; chunking moved into grist
+
+- grist (hypertidy/grist, branch `trend-ice`, 0.0.2): `backfill(chunk =)`
+  recycles workers per chunk (was the loop in `pawsey/backfill-ice.sh`);
+  README gains a Deployments table naming trend.ice and the
+  mirror-vs-remote lesson. Merge it before the next setup here.
+- trend.ice: `GRIST_REF` default is now `hypertidy/grist` (main);
+  backfill-ice.sh calls `backfill(..., chunk = CHUNK)`.
+- To pick it up on Setonix (after the grist merge):
+
+      cd /scratch/pawsey1362/mdsumner/trend.ice && git pull
+      bash pawsey/setup.sh     # reinstalls grist into ICE_LIB; mapping is rebuilt identically
+      bash pawsey/check_container.sh
+
+  The weekly scrontab run then uses the new backfill; sums are unchanged
+  (no change to accumulate_date).
+
+---
+
 ## 2026-11-14 (d) - sea ice S2 record complete; all four slots filled
 
 - CDR south mirrored to Acacia as scratch
