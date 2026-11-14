@@ -26,9 +26,10 @@ case "$ICE_SOURCE" in
   asi)
     SRC=${SRC:-asi-sic}
     TRANSFORM=${TRANSFORM:-percent_unit}   # 0-100 percent -> fraction
-    ## empty = use the CRS the index reports; setup stops if there is none
-    ## (then set CRS=... from the oracle's "source file CRS" line)
-    CRS=${CRS-}
+    ## the index carries no CRS either; the grid is the NSIDC south polar
+    ## grid at 8x (2528 x 2656, same extent), so the same CRS. The oracle
+    ## prints the CRS the source file reports, to confirm.
+    CRS=${CRS-EPSG:3412}
     EXPECT_DIM=${EXPECT_DIM-}
     ORACLE_DEFAULT=2015-09-15
     DSET=asi-amsr2-v5.4-daily-south ;;
