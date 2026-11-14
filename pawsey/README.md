@@ -20,8 +20,8 @@ and the retreat / duration maps come from one record.
 
 The catalog uses grist's mdim shape (`date, dsn, array, index`) and the
 grid is projected, both in grist since 0.0.2 (merged from the
-`mdim-projected` branch). grist is installed into its own R library (`$MYSOFTWARE/r-lib-trend-ice`, first
-on the path for these scripts only), so the other three deployments keep
+`mdim-projected` branch). grist is installed into its own R library
+(`$MYSOFTWARE/r-lib-trend-ice`, first on the path for these scripts only), so the other three deployments keep
 the grist they were validated with.
 
 Weights are pixel areas on the sphere (km2), so per cell `sumw` is ocean
