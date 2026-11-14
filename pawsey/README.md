@@ -59,8 +59,11 @@ work files, mapping and sums are per source, side by side.
   3.125 km, from 2012-08-01, transform `percent_unit`. Onboard it the same
   way, with the source set:
 
-      ICE_SOURCE=asi sbatch pawsey/onboard-ice.sh
-      ICE_SOURCE=asi sbatch pawsey/backfill-ice.sh      # after the oracle
+      sbatch pawsey/onboard-ice.sh asi
+      sbatch pawsey/backfill-ice.sh asi      # after the oracle
+
+  (an argument, not ICE_SOURCE=asi sbatch ...: Setonix jobs do not
+  inherit the submitting shell's environment)
 
   The oracle prints the CRS the source netCDF itself reports; if the
   index carries none, setup stops and asks for `CRS=...`.

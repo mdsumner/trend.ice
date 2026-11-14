@@ -8,6 +8,7 @@
 ## flat after date 1 = fixed per-worker cost, so workers = memory / that;
 ## climbing = a leak. From the repo root:  sbatch pawsey/memprobe.sh
 set -eu
+[ $# -ge 1 ] && export ICE_SOURCE=$1
 cd "${SLURM_SUBMIT_DIR:-$PWD}"
 source pawsey/config.sh
 cd "$WORK"

@@ -13,6 +13,7 @@
 ## process; no crash points at the parallel setting (mirai workers).
 ##   sbatch pawsey/crashprobe.sh
 set -eu
+[ $# -ge 1 ] && export ICE_SOURCE=$1
 cd "${SLURM_SUBMIT_DIR:-$PWD}"
 source pawsey/config.sh
 cd "$WORK"

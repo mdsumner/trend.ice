@@ -12,8 +12,13 @@
 ##   sbatch pawsey/backfill-ice.sh     # from the repo root, AFTER the oracle passed
 ## Resumable: rerun after any interruption and only the remaining dates
 ## are done. Source from ICE_SOURCE (pawsey/config.sh), e.g.
-##   ICE_SOURCE=asi sbatch pawsey/backfill-ice.sh
+##   sbatch pawsey/backfill-ice.sh asi
 set -eu
+## the source as an argument (cdr|asi): Setonix jobs do not inherit the
+## submitting shell's environment, so ICE_SOURCE=asi sbatch ... is lost
+[ $# -ge 1 ] && export ICE_SOURCE=$1
+export ICE_SOURCE=${ICE_SOURCE:-cdr}
+echo "ICE_SOURCE=$ICE_SOURCE"
 cd "${SLURM_SUBMIT_DIR:-$PWD}"
 bash pawsey/catalog.sh
 source pawsey/config.sh
