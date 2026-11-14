@@ -16,9 +16,9 @@ export NVERIFY=${1:-40}
 $RUN Rscript - <<'R'
 library(arrow); library(grist)
 reg <- read_parquet("s2_registry.parquet")
-files <- read_parquet("icefiles.parquet")
+files <- read_parquet(Sys.getenv("CAT"))
 src <- stat_source(Sys.getenv("SRC"), files, transform = Sys.getenv("TRANSFORM"),
-                   grid = list(projection = Sys.getenv("CRS")))
+                   grid = if (nzchar(Sys.getenv("CRS"))) list(projection = Sys.getenv("CRS")) else NULL)
 done <- sub("\\.parquet$", "", list.files(file.path("sums", src$name), "\\.parquet$"))
 set.seed(1)
 pick <- sample(done, min(length(done), as.integer(Sys.getenv("NVERIFY"))))

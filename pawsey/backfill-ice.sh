@@ -11,7 +11,8 @@
 ## first run at 54 workers on 96 GB was OOM-killed.
 ##   sbatch pawsey/backfill-ice.sh     # from the repo root, AFTER the oracle passed
 ## Resumable: rerun after any interruption and only the remaining dates
-## are done. ~17,500 small reads (316 x 332 each) through the index.
+## are done. Source from ICE_SOURCE (pawsey/config.sh), e.g.
+##   ICE_SOURCE=asi sbatch pawsey/backfill-ice.sh
 set -eu
 cd "${SLURM_SUBMIT_DIR:-$PWD}"
 bash pawsey/catalog.sh
@@ -22,9 +23,9 @@ $RUN Rscript - <<'R'
 library(arrow)      # FIRST, before anything loads GDAL
 library(grist)
 reg <- read_parquet("s2_registry.parquet")
-files <- read_parquet("icefiles.parquet")
+files <- read_parquet(Sys.getenv("CAT"))
 src <- stat_source(Sys.getenv("SRC"), files, transform = Sys.getenv("TRANSFORM"),
-                   grid = list(projection = Sys.getenv("CRS")))
+                   grid = if (nzchar(Sys.getenv("CRS"))) list(projection = Sys.getenv("CRS")) else NULL)
 ## workers are recycled every CHUNK dates (fresh processes per chunk): the
 ## first full run at 54 workers grew steadily to 96 GB over 70 min (a
 ## per-date leak in the read path), so no worker lives long enough for it
@@ -43,7 +44,7 @@ R
 module load rclone/1.68.1
 rclone copy --checksum sums/ $BUCKET/sums/ || echo "WARNING: sums copy FAILED" >&2
 rclone copy --checksum mapping/ $BUCKET/mapping/ || echo "WARNING: mapping copy FAILED" >&2
-for f in s2_registry.parquet icefiles.parquet; do
+for f in s2_registry.parquet "$CAT"; do
   rclone copyto --checksum $f $BUCKET/$f || echo "WARNING: $f copy FAILED" >&2
 done
 $RUN Rscript -e 'grist::write_manifest(".")' \

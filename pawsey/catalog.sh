@@ -1,38 +1,38 @@
 #!/bin/bash
 ## catalog: the grist catalog published beside the index (contract
 ## grist-catalog/mdim: date, dsn, array, index, source), as is. Writes
-## WORK/icefiles.parquet and reports span and gaps.
+## WORK/$CAT (icefiles-<SRC>.parquet) and reports span and gaps.
 set -eu
 source "$(dirname "$0")/config.sh"
 cd "$WORK"
-curl -fsS -o icefiles-src.parquet "$CATALOG_URL"
+curl -fsS -o "$CAT.src" "$CATALOG_URL"
 ## the published catalog is zstd-compressed and the container's R arrow is
 ## built without zstd: re-encode to snappy (pyarrow, else GDAL's Parquet
 ## driver), keeping the columns as they are
-rm -f icefiles.parquet
+rm -f "$CAT"
 if $RUN python3 -c "
 import pyarrow.parquet as pq
-t = pq.read_table('icefiles-src.parquet')
-pq.write_table(t, 'icefiles.parquet', compression='snappy')
+t = pq.read_table('$CAT.src')
+pq.write_table(t, '$CAT', compression='snappy')
 print('re-encoded with pyarrow', t.num_rows, 'rows')
 " 2>/dev/null; then :
-elif $RUN ogr2ogr -f Parquet -lco COMPRESSION=SNAPPY icefiles.parquet icefiles-src.parquet; then
+elif $RUN ogr2ogr -f Parquet -lco COMPRESSION=SNAPPY "$CAT" "$CAT.src"; then
   echo "re-encoded with GDAL (ogr2ogr)"
 fi
-[ -s icefiles.parquet ] || { echo "could not re-encode the catalog (no pyarrow, no GDAL Parquet with zstd)" >&2; exit 1; }
+[ -s "$CAT" ] || { echo "could not re-encode the catalog (no pyarrow, no GDAL Parquet with zstd)" >&2; exit 1; }
 ## with a mirror, every row reads through the remapped index instead
 if [ -n "$MIRROR_TO" ]; then
-  [ -s mdim-mirror.vrt ] || bash "$REPO/pawsey/remap_index.sh"
+  [ -s "mdim-mirror-$SRC.vrt" ] || bash "$REPO/pawsey/remap_index.sh"
   $RUN python3 -c "
 import pyarrow.parquet as pq, pyarrow as pa
-t = pq.read_table('icefiles.parquet')
-t = t.set_column(t.schema.get_field_index('dsn'), 'dsn', pa.array(['$WORK/mdim-mirror.vrt'] * t.num_rows))
-pq.write_table(t, 'icefiles.parquet', compression='snappy')
-print('catalog dsn ->', '$WORK/mdim-mirror.vrt')
+t = pq.read_table('$CAT')
+t = t.set_column(t.schema.get_field_index('dsn'), 'dsn', pa.array(['$WORK/mdim-mirror-$SRC.vrt'] * t.num_rows))
+pq.write_table(t, '$CAT', compression='snappy')
+print('catalog dsn ->', '$WORK/mdim-mirror-$SRC.vrt')
 "
 fi
 $RUN Rscript - <<'R'
-f <- arrow::read_parquet("icefiles.parquet")
+f <- arrow::read_parquet(Sys.getenv("CAT"))
 d <- as.Date(f$date)
 stopifnot(!anyNA(d), !anyDuplicated(d), all(c("dsn", "array", "index") %in% names(f)))
 dd <- as.integer(diff(sort(d)))

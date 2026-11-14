@@ -16,10 +16,10 @@ library(arrow); library(grist)
 rss <- function() as.numeric(gsub("[^0-9]+", "", grep("^VmRSS",
                   readLines("/proc/self/status"), value = TRUE))) / 1024
 reg <- read_parquet("s2_registry.parquet")
-files <- read_parquet("icefiles.parquet")
+files <- read_parquet(Sys.getenv("CAT"))
 cat(sprintf("after loading packages + catalog: %.0f MB\n", rss()))
 t <- system.time(src <- stat_source(Sys.getenv("SRC"), files, transform = Sys.getenv("TRANSFORM"),
-                                    grid = list(projection = Sys.getenv("CRS"))))[3]
+                                    grid = if (nzchar(Sys.getenv("CRS"))) list(projection = Sys.getenv("CRS")) else NULL))[3]
 cat(sprintf("after stat_source (resolve 17531 views): %.0f MB, %.1f s\n", rss(), t))
 for (i in c(1, 2, 5000, 5001, 11648, 11649, 15000, 15001, 17000, 17001)) {
   t <- system.time(accumulate_date(src$files$dsn[i], src$files$date[i], src, reg,

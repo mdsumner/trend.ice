@@ -1,7 +1,7 @@
 #!/bin/bash
 ## one-off: install grist (mdim-projected branch) into the trend.ice R
 ## library, fetch the S2 registry (shared with trend.sst) and the catalog,
-## build the pixel -> cell mapping for the 316 x 332 polar grid.
+## build the pixel -> cell mapping for the source's polar grid.
 ##   bash pawsey/setup.sh     (login node is fine: the mapping takes seconds)
 set -eu
 source "$(dirname "$0")/config.sh"
@@ -18,11 +18,14 @@ fi
 $RUN Rscript - <<'R'
 library(arrow); library(grist)
 reg <- read_parquet("s2_registry.parquet")
-files <- read_parquet("icefiles.parquet")
+files <- read_parquet(Sys.getenv("CAT"))
 src <- stat_source(Sys.getenv("SRC"), files, transform = Sys.getenv("TRANSFORM"),
-                   grid = list(projection = Sys.getenv("CRS")))
+                   grid = if (nzchar(Sys.getenv("CRS"))) list(projection = Sys.getenv("CRS")) else NULL)
 str(src$grid)
-stopifnot(src$shape == "mdim", isTRUE(src$grid$projected),
-          identical(src$grid$dimension, c(316L, 332L)))
+if (!isTRUE(src$grid$projected))
+  stop("no projected CRS from the index: set CRS=... (see the oracle's source file CRS line)")
+ed <- Sys.getenv("EXPECT_DIM")
+if (nzchar(ed)) stopifnot(identical(src$grid$dimension, as.integer(strsplit(ed, ",")[[1]])))
+stopifnot(src$shape == "mdim")
 build_mapping(src, reg)
 R

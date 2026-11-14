@@ -48,11 +48,28 @@ weekly scrontab entry (`pawsey/scrontab.txt`, merge with `scrontab -e`)
 keeps it current and pushes (needs credentials that work without a
 prompt, as for trend.sst).
 
-## Next sources
+## Sources
 
-- Bremen ASI AMSR2 v5.4, 3.125 km, from 2012: catalog beside its index
-  (`asi-amsr2-v5.4-daily-south/grist/catalog.parquet`), transform
-  `percent_unit`, its own source name (`asi-sic`) and mapping.
+`ICE_SOURCE` in `pawsey/config.sh` (or the environment) picks the source;
+work files, mapping and sums are per source, side by side.
+
+- `cdr` (default): NSIDC CDR G02202 v6, source name `cdr-sic`, 25 km,
+  `CRS=EPSG:3412` given because its index carries none.
+- `asi`: Bremen ASI AMSR2 v5.4 daily south, source name `asi-sic`,
+  3.125 km, from 2012-08-01, transform `percent_unit`. Onboard it the same
+  way, with the source set:
+
+      ICE_SOURCE=asi sbatch pawsey/onboard-ice.sh
+      ICE_SOURCE=asi sbatch pawsey/backfill-ice.sh      # after the oracle
+
+  The oracle prints the CRS the source netCDF itself reports; if the
+  index carries none, setup stops and asks for `CRS=...`.
+
+Both read the scratch mirrors on Acacia
+(`aad-derived/raad-scratch/<host>/<path>`) by default (`MIRROR_TO`).
+
+## Next
+
 - An ice-days source (indicator of concentration >= 15%) needs one more
   named transform in grist; its cell means are the fraction of days with
   ice, the S2 analogue of season duration.

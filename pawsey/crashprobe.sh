@@ -20,13 +20,14 @@ for MODE in A B; do
   echo "== mode $MODE"
   MODE=$MODE $RUN Rscript - <<'R' || echo "mode $MODE: process died (exit $?)"
 library(arrow); library(grist)
-files <- read_parquet("icefiles.parquet")
+files <- read_parquet(Sys.getenv("CAT"))
 src <- stat_source(Sys.getenv("SRC"), files[1:400, ], transform = Sys.getenv("TRANSFORM"),
-                   grid = list(projection = Sys.getenv("CRS")))
+                   grid = if (nzchar(Sys.getenv("CRS"))) list(projection = Sys.getenv("CRS")) else NULL)
 mode <- Sys.getenv("MODE")
 for (i in 1:300) {
   ds <- grist:::mdim_open(src$files$dsn[i], src$files$array[i], src$files$view[i])
-  v <- ds$read(1L, 0L, 0L, 316L, 332L, 316L, 332L)
+  dm <- src$grid$dimension
+  v <- ds$read(1L, 0L, 0L, dm[1], dm[2], dm[1], dm[2])
   if (mode == "A") ds$close()
   rm(ds); gc()
   if (i %% 50 == 0) cat(sprintf("mode %s: %i ok\n", mode, i))
