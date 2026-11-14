@@ -71,7 +71,7 @@ least squares) in the same south polar view as the maps above.
 
 ![Sea level anomaly ([trend.sla](https://github.com/mdsumner/trend.sla))](figures/s2_trend_sla.png)
 
-![Sea ice (to come)](figures/s2_trend_ice.png)
+![Sea ice concentration (this repository, `pawsey/`)](figures/s2_trend_ice.png)
 :::
 
 Read with care in the seasonal ice zone. SST there is held near freezing
@@ -83,6 +83,13 @@ needs the sums restricted to a fixed season (or weighted by days since
 retreat, as in the bloom analysis above); the sums support that without
 recomputation.
 
+The sea ice panel is this project's own record on the same engine: daily
+NSIDC CDR (G02202 v6) concentration summed onto S2 cells with pixel-area
+weights, read in place through a published index of the source files
+(see `pawsey/README.md`). Its trend is of the annual mean concentration,
+1979-2025, and it shows the same dipole as the retreat trend map above -
+strong loss west of the Antarctic Peninsula (Bellingshausen, extending to
+the Amundsen), gain over the Ross Sea - from an independent pipeline.
+
 Drawn by `scripts/s2_trend_maps.R`, which reads the `docs/data/cells-*.json`
-exports of each record; the sea ice panel waits for a sea ice record on
-the same engine.
+exports of each record and `site/data/cells-cdr-sic.json` for sea ice.
