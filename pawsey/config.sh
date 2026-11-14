@@ -26,10 +26,11 @@ case "$ICE_SOURCE" in
   asi)
     SRC=${SRC:-asi-sic}
     TRANSFORM=${TRANSFORM:-percent_unit}   # 0-100 percent -> fraction
-    ## the index carries no CRS either; the grid is the NSIDC south polar
-    ## grid at 8x (2528 x 2656, same extent), so the same CRS. The oracle
-    ## prints the CRS the source file reports, to confirm.
-    CRS=${CRS-EPSG:3412}
+    ## the index carries no CRS either. The grid is the NSIDC south polar
+    ## layout at 8x (2528 x 2656, same extent), but the source files
+    ## declare it on WGS84 (+proj=stere +lat_0=-90 +lat_ts=-70 +lon_0=0
+    ## +datum=WGS84), i.e. EPSG:3976, not the CDR's Hughes 1980 (3412)
+    CRS=${CRS-EPSG:3976}
     EXPECT_DIM=${EXPECT_DIM-}
     ORACLE_DEFAULT=2015-09-15
     DSET=asi-amsr2-v5.4-daily-south ;;
