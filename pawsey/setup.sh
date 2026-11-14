@@ -1,5 +1,5 @@
 #!/bin/bash
-## one-off: install grist (mdim-projected branch) into the trend.ice R
+## one-off: install grist (GRIST_REF, default main) into the trend.ice R
 ## library, fetch the S2 registry (shared with trend.sst) and the catalog,
 ## build the pixel -> cell mapping for the source's polar grid.
 ##   bash pawsey/setup.sh     (login node is fine: the mapping takes seconds)

@@ -59,11 +59,12 @@ if ! type module >/dev/null 2>&1; then _u=${-//[^u]/}; set +u; source /etc/profi
 module load pawseyenv/2024.05 singularity/4.1.0-slurm
 command -v singularity >/dev/null || { echo "singularity not found after module load" >&2; exit 1; }
 export RUN=${RUN:-"singularity exec $MYSOFTWARE/sif_lib/gdal-r-python-extras_2026-10-25.sif"}
-## grist from the mdim-projected branch goes in its OWN library, first on
-## the path, so trend.sst/sla/chl keep the grist they were validated with
+## grist (main, >= 0.0.2: mdim catalogs, projected grids, chunked
+## backfill) goes in its OWN library, first on the path, so
+## trend.sst/sla/chl keep the grist they were validated with
 export ICE_LIB=${ICE_LIB:-$MYSOFTWARE/r-lib-trend-ice}
 export R_LIBS_USER=$ICE_LIB:${R_LIBS_USER_BASE:-$MYSOFTWARE/r-lib}
-GRIST_REF=${GRIST_REF:-hypertidy/grist@mdim-projected}
+GRIST_REF=${GRIST_REF:-hypertidy/grist}
 ## per-worker GDAL limits (lessons from trend.sla)
 export GDAL_CACHEMAX=256
 export GDAL_PAM_ENABLED=NO
