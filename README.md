@@ -4,8 +4,8 @@
 `scripts/make_maps.R`, published by `.github/workflows/pages.yml`).
 
 Southern Ocean sea ice seasonality - day of advance, day of retreat, ice season
-duration and day count - per pixel per ice year, as a member of the trend.*
-family of ocean climate records (trend.sst, trend.sla, trend.chl).
+duration and day count - per pixel per ice year, as a member of the [trend.* family](https://australianantarcticdivision.github.io/trend/)
+of ocean climate records (trend.sst, trend.sla, trend.chl).
 
 The first purpose is a clean seasonality layer for aligning ocean colour
 (chlorophyll) with the timing of sea ice retreat.

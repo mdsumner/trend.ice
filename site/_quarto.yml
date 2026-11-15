@@ -20,6 +20,8 @@ website:
       - href: data.qmd
         text: Data
     right:
+      - text: "trend family"
+        href: https://australianantarcticdivision.github.io/trend/
       - icon: github
         href: https://github.com/mdsumner/trend.ice
 
