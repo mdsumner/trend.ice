@@ -13,7 +13,10 @@ $RUN Rscript pawsey/export_ice.R "$WORK" site/data/cells-cdr-sic.json \
 $RUN Rscript scripts/s2_trend_maps.R site/figures || { echo "maps FAILED" >&2; status=1; }
 git add site/data site/figures/s2_trend_*.png
 if git diff --cached --quiet; then echo "site unchanged"
-else git commit -q -m "S2 trends: regenerated from sums ($(date -u +%F))" && git push -q origin main \
+## pull before pushing: commits made elsewhere (merges, site edits) would
+## otherwise make every unattended push a rejected non-fast-forward
+else git commit -q -m "S2 trends: regenerated from sums ($(date -u +%F))" \
+  && git pull -q --rebase --autostash origin main && git push -q origin main \
   && echo "site pushed" || { echo "push FAILED" >&2; status=1; }
 fi
 echo "trend.ice weekly: done $(date -u +%FT%TZ), status $status"
