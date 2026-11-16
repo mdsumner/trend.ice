@@ -1,9 +1,9 @@
 ## weekly refresh of trend.ice S2 sea ice sums on Setonix. The CDR adds
-## days with a lag, so weekly is plenty. Do NOT install with
-## "scrontab scrontab.txt" (that replaces your WHOLE scrontab, and
-## trend.sst/sla/chl have entries); save first and merge with scrontab -e:
-##   scrontab -l > ~/scrontab-backup-$(date +%F).txt
-##   scrontab -e      # paste the lines below
+## days with a lag, so weekly is plenty.
+## A scrontab FRAGMENT: never `scrontab` this file directly (that replaces
+## the whole per-user crontab). Select it and install with scron from
+## AustralianAntarcticDivision/trend (tools/scron):
+##   scron enable NN-<repo> <this file>; scron diff; scron install
 ## Times are Setonix local (AWST). Mondays 03:41.
 #SCRON --job-name=ice-weekly
 #SCRON --account=pawsey1362
