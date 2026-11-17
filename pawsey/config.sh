@@ -9,8 +9,11 @@ mkdir -p "$WORK"
 ## its published index (mdim VRT over the original netCDF files) and the
 ## grist catalog published beside it. Work files are per source (catalog,
 ## index copies, mapping/<SRC>, sums/<SRC>), so sources sit side by side.
-##   cdr: NSIDC CDR G02202 v6 daily south, 25 km, from 1978-10-25
-##   asi: Bremen ASI AMSR2 v5.4 daily south, 3.125 km, from 2012-08-01
+##   cdr:       NSIDC CDR G02202 v6 daily south, 25 km, from 1978-10-25
+##   cdr-north: NSIDC CDR G02202 v6 daily north, 25 km, from 1978-10-25
+##   asi:       Bremen ASI AMSR2 v5.4 daily south, 3.125 km, from 2012-08-01
+## HEMI is the hemisphere (the oracle's map), REF the CDR source of the
+## same hemisphere (the oracle's cross-check for a second source).
 ICE_SOURCE=${ICE_SOURCE:-cdr}
 SC=https://data.source.coop/ausantarctic/ausantarctic-scratch/seaice
 case "$ICE_SOURCE" in
@@ -22,7 +25,21 @@ case "$ICE_SOURCE" in
     CRS=${CRS-EPSG:3412}
     EXPECT_DIM=${EXPECT_DIM-316,332}
     ORACLE_DEFAULT=2010-09-15
+    HEMI=south; REF=cdr-sic
     DSET=g02202-v6-daily-south ;;
+  cdr-north)
+    SRC=${SRC:-cdr-sic-north}
+    TRANSFORM=${TRANSFORM:-unit_interval}
+    ## NSIDC Sea Ice Polar Stereographic North (Hughes 1980), the CDR
+    ## north grid's own CRS; the index carries none, as for the south.
+    ## Lakes are masked in the source; the pole hole is filled by spatial
+    ## interpolation (cdr_seaice_conc_interp_spatial_flag), so the valid
+    ## mask is the same in every sensor era.
+    CRS=${CRS-EPSG:3411}
+    EXPECT_DIM=${EXPECT_DIM-304,448}
+    ORACLE_DEFAULT=2010-03-15                # near the Arctic maximum
+    HEMI=north; REF=cdr-sic-north
+    DSET=g02202-v6-daily-north ;;
   asi)
     SRC=${SRC:-asi-sic}
     TRANSFORM=${TRANSFORM:-percent_unit}   # 0-100 percent -> fraction
@@ -33,8 +50,9 @@ case "$ICE_SOURCE" in
     CRS=${CRS-EPSG:3976}
     EXPECT_DIM=${EXPECT_DIM-}
     ORACLE_DEFAULT=2015-09-15
+    HEMI=south; REF=cdr-sic
     DSET=asi-amsr2-v5.4-daily-south ;;
-  *) echo "unknown ICE_SOURCE '$ICE_SOURCE' (cdr or asi)" >&2; exit 1 ;;
+  *) echo "unknown ICE_SOURCE '$ICE_SOURCE' (cdr, cdr-north or asi)" >&2; exit 1 ;;
 esac
 CATALOG_URL=${CATALOG_URL:-$SC/$DSET/grist/catalog.parquet}
 INDEX_URL=${INDEX_URL:-$SC/$DSET/mdim.vrt}
@@ -76,4 +94,4 @@ export GDAL_LOAD_EXTRA_DIM_METADATA_DELAY=0
 WORKERS=${WORKERS:-12}
 ## dates per chunk; workers are fresh processes per chunk (bounds a leak)
 CHUNK=${CHUNK:-1000}
-export ICE_SOURCE SRC TRANSFORM CRS EXPECT_DIM ORACLE_DEFAULT CAT WORK REPO WORKERS CHUNK MIRROR_TO
+export ICE_SOURCE SRC TRANSFORM CRS EXPECT_DIM ORACLE_DEFAULT HEMI REF CAT WORK REPO WORKERS CHUNK MIRROR_TO

@@ -94,6 +94,6 @@ the Amundsen), gain over the Ross Sea - from an independent pipeline.
 Drawn by `scripts/s2_trend_maps.R`, which reads the `docs/data/cells-*.json`
 exports of each record and `site/data/cells-cdr-sic.json` for sea ice.
 The same four records are live in the [Explorer](index.html): sea ice is
-its own source there (CDR and ASI), and SST, chlorophyll and sea level load
-from their own sites onto the same cells, so a cell selection carries from
-one record to the next.
+its own source there (the CDR for both poles, ASI for the south), and SST,
+chlorophyll and sea level load from their own sites onto the same cells,
+so a cell selection carries from one record to the next.

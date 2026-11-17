@@ -3,13 +3,17 @@
 ## (1) exact: the count of valid pixels summed over cells must equal numpy
 ##     on the same array slice, read by the Python multidim API
 ##     independently of grist's R path (same transform rule).
-## (2) look: the map. Mid-September is near maximum: ice all round the
-##     continent out to ~55-60S, open water north, no flips.
+## (2) look: the map, polar view of the source's hemisphere (HEMI). South,
+##     mid-September is near maximum: ice all round the continent out to
+##     ~55-60S, open water north, no flips. North, mid-March: the Arctic
+##     Ocean full, ice in the Bering, Okhotsk, Baffin and Labrador seas,
+##     the Barents ice edge, open Norwegian Sea; no flips.
 ## (3) cross-checks: the CRS the source netCDF itself reports (for a
 ##     source whose index carries none), and for a second source, the CDR
-##     sums for the same day when they exist (ice area should be close;
-##     ASI and the CDR differ by algorithm, typically by several percent).
-##   bash pawsey/oracle.sh [date]            (ICE_SOURCE=cdr|asi)
+##     sums of the same hemisphere (REF) for the same day when they exist
+##     (ice area should be close; ASI and the CDR differ by algorithm,
+##     typically by several percent).
+##   bash pawsey/oracle.sh [date]            (ICE_SOURCE=cdr|cdr-north|asi)
 set -eu
 source "$(dirname "$0")/config.sh"
 cd "$WORK"
@@ -29,8 +33,8 @@ s <- read_parquet(out)
 cat(sprintf("ORACLE %s %s %s %s view %s\n", Sys.getenv("SRC"), d, files$array[i], files$index[i], src$files$view[1]))
 cat(sprintf("GRIST n=%.0f area_km2=%.1f ice_area_Mkm2=%.3f mean_conc=%.4f\n",
             sum(s$n), sum(s$sumw), sum(s$sumwx) / 1e6, sum(s$sumwx) / sum(s$sumw)))
-cdr <- file.path("sums", "cdr-sic", sprintf("%s.parquet", d))
-if (Sys.getenv("SRC") != "cdr-sic" && file.exists(cdr)) {
+cdr <- file.path("sums", Sys.getenv("REF"), sprintf("%s.parquet", d))
+if (Sys.getenv("SRC") != Sys.getenv("REF") && file.exists(cdr)) {
   k <- read_parquet(cdr)
   cat(sprintf("CDR same day: ice_area_Mkm2=%.3f (n=%.0f, 25 km)\n", sum(k$sumwx) / 1e6, sum(k$n)))
 }
@@ -38,12 +42,18 @@ s$mean <- s$sumwx / s$sumw
 ii <- match(s$cell, reg$cell)
 png(sprintf("oracle-%s-%s.png", Sys.getenv("SRC"), d), 900, 900)
 pal <- hcl.colors(101, "Blues 3", rev = TRUE)
-## south polar view of the cell centres, Greenwich down, 90E right
-r <- (90 + reg$lat[ii]); x <- r * sin(reg$lon[ii] * pi / 180); y <- -r * cos(reg$lon[ii] * pi / 180)
+## polar view of the cell centres as seen from above the pole, Greenwich
+## down: longitude runs clockwise round the south pole (90E on the left)
+## and anticlockwise round the north pole (90E on the right). (Before the
+## north was added the south view had 90E on the right: a mirror image.)
+north <- Sys.getenv("HEMI") == "north"
+r <- if (north) 90 - reg$lat[ii] else 90 + reg$lat[ii]
+x <- (if (north) 1 else -1) * r * sin(reg$lon[ii] * pi / 180); y <- -r * cos(reg$lon[ii] * pi / 180)
 plot(x, y, col = pal[round(pmin(1, pmax(0, s$mean)) * 100) + 1], pch = 15, cex = 1.6, asp = 1, axes = FALSE,
      xlab = "", ylab = "", main = sprintf("%s %s: mean concentration per S2 cell (0 white, 1 dark)",
                                           Sys.getenv("SRC"), d))
-text(0, 0, "S Pole"); text(0, -50, "0 E (Greenwich) ->", pos = 1)
+text(0, 0, if (north) "N Pole" else "S Pole"); text(0, -50, "0 E (Greenwich)", pos = 1)
+text(if (north) 50 else -50, 0, "90 E", pos = if (north) 4 else 2)
 dev.off()
 writeLines(c(format(d), files$dsn[i], files$array[i], src$files$view[1], if (is.null(files$source)) "" else files$source[i]),
            "oracle-date.txt")
