@@ -47,7 +47,7 @@ for both poles: NSIDC CDR concentration and area from 1978 in the
 Antarctic and the Arctic (one transverse Mercator on 115E holds both),
 for any region from the globe down to a single cell, beside the other
 trend records. The seasonality and bloom analysis on these pages is
-Antarctic. See [Maps](maps.qmd) for where, [Results](results.qmd) for the curves
+Antarctic. See [Seasons](maps.qmd) for where, [Results](results.qmd) for the curves
 behind these statements, [Methods](methods.qmd) for how, and
 [Data](data.qmd) for everything needed to reproduce or reuse it.
 
