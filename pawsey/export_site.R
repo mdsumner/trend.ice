@@ -14,8 +14,7 @@
 ## as weights, so sumwx is sea ice area in km2. The site shows percent.
 ## Cell w is the cell's mean daily ocean area (km2), so for any union of
 ## cells sum(w * mean) is sea ice area: the explorer's "Area" series.
-## (The sst/sla/chl exporters write w = sumw / n, a mean PER-PIXEL
-## weight; for a union mean the cell's ocean area is the exact weight.)
+## (The sst/sla/chl exporters use the same w: mean sumw per time step.)
 ## Deliberately GDAL-free, as the sibling exporters: arrow, s2, reproj.
 suppressPackageStartupMessages({ library(arrow); library(dplyr) })
 args <- commandArgs(trailingOnly = TRUE)
