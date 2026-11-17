@@ -1,7 +1,8 @@
 # trend.ice
 
 **Site:** <https://mdsumner.github.io/trend.ice/>, in the shared look of the
-trend.* family: the landing page is the S2 cell explorer, with Status and
+trend.* family: the landing page is the S2 cell explorer (sea ice for both
+poles: the NSIDC CDR north and south, Bremen ASI south), with Status and
 Mechanics beside it (kit pages, `site/index.html` etc., configured by
 `site/site.js`; the kit itself is a vendored copy in `site/kit/`, synced from
 AustralianAntarcticDivision/trend with `tools/kit-sync`). The analysis pages

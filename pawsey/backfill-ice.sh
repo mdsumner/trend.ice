@@ -14,7 +14,7 @@
 ## are done. Source from ICE_SOURCE (pawsey/config.sh), e.g.
 ##   sbatch pawsey/backfill-ice.sh asi
 set -eu
-## the source as an argument (cdr|asi): Setonix jobs do not inherit the
+## the source as an argument (cdr|cdr-north|asi): Setonix jobs do not inherit the
 ## submitting shell's environment, so ICE_SOURCE=asi sbatch ... is lost
 [ $# -ge 1 ] && export ICE_SOURCE=$1
 export ICE_SOURCE=${ICE_SOURCE:-cdr}

@@ -42,9 +42,12 @@ records (sea surface temperature, sea level, chlorophyll, and now sea ice).
   explain little of the year-to-year variation; the likely missing driver
   is iron supply.
 
-The [Explorer](index.html) has the sea ice record itself on S2 cells
-(concentration and area, any region, from 1978) beside the other trend
-records. See [Maps](maps.qmd) for where, [Results](results.qmd) for the curves
+The [Explorer](index.html) has the sea ice record itself on S2 cells,
+for both poles: NSIDC CDR concentration and area from 1978 in the
+Antarctic and the Arctic (one transverse Mercator on 115E holds both),
+for any region from the globe down to a single cell, beside the other
+trend records. The seasonality and bloom analysis on these pages is
+Antarctic. See [Maps](maps.qmd) for where, [Results](results.qmd) for the curves
 behind these statements, [Methods](methods.qmd) for how, and
 [Data](data.qmd) for everything needed to reproduce or reuse it.
 

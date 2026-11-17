@@ -8,6 +8,39 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-17 (b) - the Arctic: CDR north on S2 cells, one bipolar source
+
+- New source `cdr-north` (`pawsey/config.sh`): NSIDC CDR G02202 v6
+  daily north, 304 x 448, EPSG:3411, read through the published index
+  remapped to the Acacia mirror; store `sums/cdr-sic-north`. Lakes are
+  masked in the source; the pole hole is spatially interpolated, so the
+  valid mask is constant across sensors.
+- Checked here before Setonix (grist 0.0.2 in a scratch library): the
+  oracle (2010-03-15) n = 67403 equals an independent ncdf4 read;
+  full backfill ~26 min. NH area: 2012-09-15 minimum 2.73 M km2 (the
+  record), annual mean trend -0.54 M km2/decade (-5 %), annual minimum
+  -0.77; global -0.58. Missing in the north only: 1984-07-03..08-04 (no
+  input data in the source files).
+- `export_site.R`: site sources are made of stores; the CDR is one
+  bipolar source (`cdr-sic` + `cdr-sic-north`), ASI south only. Regions:
+  global, NH, and 18 Arctic and subarctic seas after the NSIDC regional
+  masks (boxes at cell grain; trend.sst's Bering polygon); the seas sum
+  to NH. With no north store the export is byte-identical to before.
+- Kit (hub `north`): explorer `tmerc.frame` south | north | both (one
+  transverse Mercator on 115E holds both caps; the site default is
+  both), code reads only the stores holding the selection, status page
+  per store with labels. The oracle's south plot was a mirror image
+  (90E on the right with Greenwich down); fixed with the north view.
+- Next, on Setonix after the PRs merge: `git pull` in the clone, then
+
+      sbatch pawsey/onboard-ice.sh cdr-north     # read GRIST/NUMPY n, look at the png
+      sbatch pawsey/backfill-ice.sh cdr-north    # publishes sums/cdr-sic-north
+
+  and the next weekly run (or `bash pawsey/weekly.sh` in a job) exports
+  both poles. Bremen ASI north needs a mirror (n3125) and an index first.
+
+---
+
 ## 2026-11-14 (e) - grist follows main; chunking moved into grist
 
 - grist (hypertidy/grist, branch `trend-ice`, 0.0.2): `backfill(chunk =)`

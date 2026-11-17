@@ -7,7 +7,7 @@
 ## recompute N random finished dates in ONE process (no workers) and
 ## compare with the stored sums exactly: guards against any corruption
 ## from the worker crashes seen in the backfill log.
-##   sbatch pawsey/verify.sh [N=40] [cdr|asi]
+##   sbatch pawsey/verify.sh [N=40] [cdr|cdr-north|asi]
 set -eu
 [ -n "${2:-}" ] && export ICE_SOURCE=$2
 cd "${SLURM_SUBMIT_DIR:-$PWD}"
