@@ -1,7 +1,13 @@
 # trend.ice
 
-**Site:** <https://mdsumner.github.io/trend.ice/> (Quarto, `site/`; maps made by
-`scripts/make_maps.R`, published by `.github/workflows/pages.yml`).
+**Site:** <https://mdsumner.github.io/trend.ice/>, in the shared look of the
+trend.* family: the landing page is the S2 cell explorer, with Status and
+Mechanics beside it (kit pages, `site/index.html` etc., configured by
+`site/site.js`; the kit itself is a vendored copy in `site/kit/`, synced from
+AustralianAntarcticDivision/trend with `tools/kit-sync`). The analysis pages
+are Quarto (`site/*.qmd`), rendered in the same look; maps made by
+`scripts/make_maps.R`; site data (`site/data/`) by `pawsey/export_site.R`;
+published by `.github/workflows/pages.yml`.
 
 Southern Ocean sea ice seasonality - day of advance, day of retreat, ice season
 duration and day count - per pixel per ice year, as a member of the [trend.* family](https://australianantarcticdivision.github.io/trend/)

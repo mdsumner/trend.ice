@@ -10,7 +10,7 @@
 ## Sources are read from sibling clones if present (../trend.sst etc.),
 ## otherwise from the Pages sites. Override with environment variables
 ## TREND_SST, TREND_CHL, TREND_SLA (path or URL to the cells JSON). The
-## sea ice panel is this repo's own export (pawsey/export_ice.R ->
+## sea ice panel is this repo's own export (pawsey/export_site.R ->
 ## site/data/cells-cdr-sic.json, or TREND_ICE); while that file does not
 ## exist the panel keeps its placeholder.
 ##
