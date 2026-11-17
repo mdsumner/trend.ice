@@ -9,11 +9,18 @@ trend maps.
 ## Source
 
 NSIDC CDR of passive microwave sea ice concentration, G02202 v6, daily,
-south, 25 km polar stereographic (316 x 332), from 1978-10-25. Read in
-place through the published index (an mdim VRT over the original netCDF
+25 km polar stereographic, from 1978-10-25, both hemispheres: south
+(316 x 332, EPSG:3412) and north (304 x 448, EPSG:3411). Each is read in
+place through its published index (an mdim VRT over the original netCDF
 files) using the grist catalog published beside it:
 
     https://data.source.coop/ausantarctic/ausantarctic-scratch/seaice/g02202-v6-daily-south/grist/catalog.parquet
+    https://data.source.coop/ausantarctic/ausantarctic-scratch/seaice/g02202-v6-daily-north/grist/catalog.parquet
+
+The two hemispheres are separate stores (`sums/cdr-sic`, south, and
+`sums/cdr-sic-north`) with disjoint cells; `export_site.R` joins them
+into one bipolar CDR source for the site, with global, hemisphere and
+regional series.
 
 Same product as the ice season COGs (`R/ice_season.R`), so the S2 trends
 and the retreat / duration maps come from one record.
@@ -35,7 +42,7 @@ area covered and `sumwx` is sea ice area (km2).
     sbatch pawsey/onboard-ice.sh         # grist branch, registry, catalog, mapping, oracle
 
 Read the GRIST and NUMPY lines in `ice-onboard-<jobid>.out` (`n` must be
-equal) and LOOK at `$WORK/oracle-2010-09-15.png` (default WORK is
+equal) and LOOK at `$WORK/oracle-cdr-sic-2010-09-15.png` (default WORK is
 `/scratch/pawsey1362/$USER/trend-ice-s2`). Only then:
 
     sbatch pawsey/backfill-ice.sh        # all dates; publishes to aad-derived/trend-ice/s2/
@@ -55,6 +62,22 @@ work files, mapping and sums are per source, side by side.
 
 - `cdr` (default): NSIDC CDR G02202 v6, source name `cdr-sic`, 25 km,
   `CRS=EPSG:3412` given because its index carries none.
+- `cdr-north`: NSIDC CDR G02202 v6 north, source name `cdr-sic-north`,
+  25 km, `CRS=EPSG:3411` given (the index carries none). Lakes are
+  masked in the source and the pole hole is filled by spatial
+  interpolation, so the valid mask is the same in every sensor era.
+  Onboard and backfill it once by hand:
+
+      sbatch pawsey/onboard-ice.sh cdr-north     # oracle: 2010-03-15, the Arctic near maximum
+      sbatch pawsey/backfill-ice.sh cdr-north    # after the oracle
+
+  then `weekly.sh` keeps it current (it skips the north until the
+  mapping exists). Checked locally before deployment: the oracle matched
+  an independent read of the netCDF exactly (n = 67403 valid pixels,
+  14.26 M km2 of ice); the full backfill (17,436 dates) took ~26 min
+  from the Acacia mirror at 16-32 workers. The north has 33 more missing
+  days than the south, 1984-07-03..08-04: the source files hold no data
+  (every pixel flagged "no input data").
 - `asi`: Bremen ASI AMSR2 v5.4 daily south, source name `asi-sic`,
   3.125 km, from 2012-08-01, transform `percent_unit`. Onboard it the same
   way, with the source set:

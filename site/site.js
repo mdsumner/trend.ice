@@ -17,10 +17,13 @@ window.TREND_SITE = {
     // the other records on the same cells, read from their own sites
     family: ["sst:oisst", "chl:occci-log10chl", "sla:sla-cmems"],
     // transverse Mercator on 115E (+proj=tmerc +lon_0=115, as seaice.map),
-    // framed on the cap south of 40S; Equal Earth and the rest in the menu
+    // framed on both polar caps (beyond 40S and 40N): the two poles lie on
+    // the central meridian, so one map holds the global ice, Antarctic
+    // below, Arctic above. frame "south" or "north" frames one cap.
+    // Equal Earth and the rest are in the menu.
     view: "tmerc",
     rotate: [-115, 70],
-    tmerc: { lat: -90, radius: 50 },
+    tmerc: { frame: "both", radius: 50 },
     coast: true
   }
 };

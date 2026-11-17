@@ -1,6 +1,7 @@
 #!/bin/bash
 ## weekly refresh of the sea ice S2 record (run by pawsey/scrontab.txt):
-## backfill new CDR and ASI days through their indexes, export the site
+## backfill new CDR (south; north once onboarded) and ASI days through
+## their indexes, export the site
 ## data (site/data: the explorer, status and mechanics pages, and the cell
 ## trends the S2 panels are drawn from), redraw the S2 panels, push if
 ## anything changed.
@@ -11,6 +12,14 @@ status=0
 bash pawsey/backfill-ice.sh cdr || { echo "backfill cdr FAILED" >&2; status=1; }
 ## ASI is the second source on the site; its failure must not stop the CDR refresh
 bash pawsey/backfill-ice.sh asi || { echo "backfill asi FAILED" >&2; status=1; }
+## CDR north, once onboarded (sbatch pawsey/onboard-ice.sh cdr-north, then
+## its first backfill by hand); until then the export is south only
+NORTH_MAP=$(ICE_SOURCE=cdr-north bash -c 'source pawsey/config.sh >/dev/null 2>&1; echo "$WORK/mapping/$SRC/meta.rds"')
+if [ -f "$NORTH_MAP" ]; then
+  bash pawsey/backfill-ice.sh cdr-north || { echo "backfill cdr-north FAILED" >&2; status=1; }
+else
+  echo "cdr-north not onboarded ($NORTH_MAP missing): skipped"
+fi
 source pawsey/config.sh
 $RUN Rscript pawsey/export_site.R "$WORK" site/data \
   || { echo "export FAILED" >&2; status=1; }
