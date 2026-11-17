@@ -27,6 +27,28 @@ Clones: Nectar `~/Git/trend.ice`; Gadi `~/trend.ice`.
 
 ---
 
+## 2026-11-17 - site joins the family kit; explorer is the landing page
+
+- The four trend.* sites now share one kit (AustralianAntarcticDivision/
+  trend `kit/`, vendored here in `site/kit/` by `tools/kit-sync`): header
+  and tabs from `site/site.js`, the S2 cell explorer as `index.html`,
+  status and mechanics pages. The analysis pages stay Quarto, rendered in
+  the kit look (`theme: none`, `minimal: true`, `kit/quarto.css`); the old
+  landing page is `overview.qmd`.
+- Explorer default is transverse Mercator on 115E (as seaice.map), framed
+  south of 40S; Equal Earth and the other views are in the menu. Sources:
+  CDR and ASI, plus SST (OISST), chl and SLA read live from their sites.
+  "Area" shows a selection's sea ice area (w = mean daily ocean km2).
+- `pawsey/export_site.R` replaces `export_ice.R`: the family data schema
+  for both sources (status, area series by sector, cells + monthly).
+  Checked locally against a copy of the published sums: CDR trends and
+  means identical to the old export for all 613 cells; Sept 2014 area
+  18.05 M km2, Feb 2023 1.26; ASI - CDR area -0.12 +- 0.24 M km2.
+- `weekly.sh` now backfills ASI as well as CDR and runs the new export.
+  Watch the first scheduled run after merge.
+
+---
+
 ## 2026-11-14 (d) - sea ice S2 record complete; all four slots filled
 
 - CDR south mirrored to Acacia as scratch

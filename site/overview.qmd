@@ -42,7 +42,9 @@ records (sea surface temperature, sea level, chlorophyll, and now sea ice).
   explain little of the year-to-year variation; the likely missing driver
   is iron supply.
 
-See [Maps](maps.qmd) for where, [Results](results.qmd) for the curves
+The [Explorer](index.html) has the sea ice record itself on S2 cells
+(concentration and area, any region, from 1978) beside the other trend
+records. See [Maps](maps.qmd) for where, [Results](results.qmd) for the curves
 behind these statements, [Methods](methods.qmd) for how, and
 [Data](data.qmd) for everything needed to reproduce or reuse it.
 

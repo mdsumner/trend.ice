@@ -40,7 +40,7 @@ equal) and LOOK at `$WORK/oracle-2010-09-15.png` (default WORK is
 
     sbatch pawsey/backfill-ice.sh        # all dates; publishes to aad-derived/trend-ice/s2/
     source pawsey/config.sh
-    $RUN Rscript pawsey/export_ice.R "$WORK" site/data/cells-cdr-sic.json
+    $RUN Rscript pawsey/export_site.R "$WORK" site/data
     $RUN Rscript scripts/s2_trend_maps.R site/figures
 
 then commit `site/data` and `site/figures/s2_trend_*.png`. After that the
