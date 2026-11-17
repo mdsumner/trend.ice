@@ -18,7 +18,9 @@
 //   view     default view: world | tmerc | ortho | longlat | spilhaus | faces
 //   rotate   initial [lambda, phi]: the globe centres on (-lambda, -phi),
 //            the flat views and tmerc use -lambda as central meridian
-//   tmerc    { lat, radius }: the spherical cap the tmerc view frames
+//   tmerc    { frame, radius, lon0 }: the tmerc view's frame, "south" |
+//            "north" | "both" polar caps of that radius; lon0 pins its
+//            central meridian (else it shares the others', -rotate[0])
 (function () {
 const SITE = window.TREND_SITE, RECS = window.TREND_RECORDS;
 const HOME = SITE.record, XC = SITE.explorer || {};
@@ -287,7 +289,13 @@ function build(D, meta, monthly, aux, wm) {
   const tmCap = tmFrame === "both"
     ? { type: "MultiPolygon", coordinates: [tmPole(-90), tmPole(90)] }
     : { type: "Polygon", coordinates: tmPole(tmFrame === "north" ? 90 : -90) };
-  const tmProj = d3.geoTransverseMercator().rotate([UI.rotate[0], 0])
+  // tmerc.lon0 pins this view's central meridian (its own, turned by
+  // shift-drag), so e.g. a Pacific-centred world view can sit beside a
+  // transverse Mercator on 115E; unset, it shares the other views'
+  const tmOwn = TM.lon0 != null;
+  if (tmOwn && UI.tmRot == null) UI.tmRot = -TM.lon0;
+  const tmRot = () => tmOwn ? UI.tmRot : UI.rotate[0];
+  const tmProj = d3.geoTransverseMercator().rotate([tmRot(), 0])
     .fitExtent([[8, 8], [size - 8, size - 8]], tmCap)
     .precision(.7).clipExtent([[0, 0], [size, size]]);
   const tmBase = tmProj.scale();
@@ -767,7 +775,7 @@ function build(D, meta, monthly, aux, wm) {
          if (ev.shiftKey) {
            // turn: the central meridian; about the pole, ~180 degrees per view width
            tmProj.rotate([drag[2][0] + dx * 180 / size, 0]);
-           UI.rotate[0] = tmProj.rotate()[0];
+           if (tmOwn) UI.tmRot = tmProj.rotate()[0]; else UI.rotate[0] = tmProj.rotate()[0];
          } else {
            const s = tmProj.scale();
            UI.tmo = [drag[2][1] + dx / s, drag[2][2] + dy / s];
@@ -825,10 +833,11 @@ function build(D, meta, monthly, aux, wm) {
     view = UI.view = e.target.value;
     pan.x = 0; pan.y = 0; pan.k = 1;
     // every view shares the central meridian: the view follows you
+    // (tmerc unless its own is pinned, tmerc.lon0)
     proj.rotate(UI.rotate);
     llProj.rotate([UI.rotate[0], 0]);
     eeProj.rotate([UI.rotate[0], 0]);
-    tmProj.rotate([UI.rotate[0], 0]);
+    tmProj.rotate([tmRot(), 0]);
     render(); drawRamp();
   });
   $("#metric").addEventListener("change", e => {
