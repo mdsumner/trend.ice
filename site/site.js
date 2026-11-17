@@ -8,7 +8,7 @@ window.TREND_SITE = {
   title: "trend.ice",
   repo: "https://github.com/mdsumner/trend.ice",
   tabs: [["index.html", "Explorer"], ["status.html", "Status"],
-         ["overview.html", "Overview"], ["maps.html", "Maps"],
+         ["overview.html", "Overview"], ["maps.html", "Seasons"],
          ["results.html", "Results"], ["methods.html", "Methods"],
          ["data.html", "Data"], ["mechanics.html", "Mechanics"]],
   dataHint: "Run pawsey/export_site.R and commit site/data/.",
